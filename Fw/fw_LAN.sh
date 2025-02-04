@@ -23,8 +23,6 @@ iptables -P FORWARD ACCEPT
 
 # APLIQUEM NAT
 
-# quan Ip desti = red Interconnexio --> envia per la tarjeta de la red interconnexio vlan60
-iptables -t nat -A POSTROUTING -d $RedInterconexio  -o $vlan60 -j MASQUERADE
 # quan Ip desti = red LAN --> envia per la tarjeta de la vlan 3
 iptables -t nat -A POSTROUTING -d $RedLAN           -o $vlan3   -j MASQUERADE
 # Por defecto que lo envie a interconexion

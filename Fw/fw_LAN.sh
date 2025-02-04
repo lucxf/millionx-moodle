@@ -1,13 +1,10 @@
 #/bin/bash
 
-vlan3=
-vlan60=
+vlan3="ens37"
+vlan60="ens33"
 
 RedInterconexio="192.168.60.0/24"
 RedLAN="10.0.0.0/8"
-
-reds=($RedInterconexio $RedLAN)
-targetes=($vlan60 $vlan3)
 
 # Borramos reglas por defecto
 iptables -F
@@ -28,5 +25,7 @@ iptables -P FORWARD ACCEPT
 
 # quan Ip desti = red Interconnexio --> envia per la tarjeta de la red interconnexio vlan60
 iptables -t nat -A POSTROUTING -d $RedInterconexio  -o $vlan60 -j MASQUERADE
-# quan Ip desti = red Administracio --> envia per la tarjeta de la vlan 40
+# quan Ip desti = red LAN --> envia per la tarjeta de la vlan 3
 iptables -t nat -A POSTROUTING -d $RedLAN           -o $vlan3   -j MASQUERADE
+# Por defecto que lo envie a interconexion
+iptables -t nat -A POSTROUTING                      -o $vlan60   -j MASQUERADE

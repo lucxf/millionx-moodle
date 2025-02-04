@@ -1,8 +1,8 @@
 #!/bin/bash
 
-NicExt=
-vlan20=
-vlan60=
+NicExt="ens33"
+vlan20="ens37"
+vlan60="ens38"
 
 RedInterconexio="192.168.60.0/24"
 RedDMZ="192.168.20.0/24"

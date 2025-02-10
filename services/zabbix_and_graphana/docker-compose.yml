@@ -1,24 +1,12 @@
 version: '2.2'
 services:
-  zabbix_db:
-    container_name: zabbix_db
-    image: mysql:5.7  # Asegúrate de usar una versión de MySQL compatible
-    restart: always
-    volumes:
-      - /volums/moodle_project/zabbix_db:/var/lib/mysql
-    env_file:
-      - zabbix.env
-    networks:
-      - internal
 
   zabbix:
     container_name: zabbix
-    image: zabbix/zabbix-appliance  # Se debe especificar la imagen completa, como la de la aplicación Zabbix
+    image: zabbix/zabbix-server-mysql # Se debe especificar la imagen completa, como la de la aplicación Zabbix
     restart: always
     volumes:
       - /volums/moodle_project/zabbix:/var/lib/zabbix
-    depends_on:
-      - zabbix_db
     env_file:
       - zabbix.env
     networks:

@@ -9,16 +9,14 @@ p_visible_prox1="4731"
 p_visible_prox2="4732"
 p_visible_prox3="4733"
 p_visible_prox4="4734"
-p_visible_NAS="4735"
 
 p_interno_proxmox="8006"
-p_interno_NAS="10000"
 
 proxmox1="192.168.40.10"
 proxmox2="192.168.40.11"
 proxmox3="192.168.40.12"
 proxmox4="192.168.40.13"
-NAS="192.168.40.14"
+
 # Borramos reglas por defecto
 iptables -F
 # Borro todas las reglas NAT
@@ -47,7 +45,6 @@ iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_visible_prox1 -j DNAT
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_visible_prox2 -j DNAT --to-destination $proxmox2:$p_interno_proxmox
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_visible_prox3 -j DNAT --to-destination $proxmox3:$p_interno_proxmox
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_visible_prox4 -j DNAT --to-destination $proxmox4:$p_interno_proxmox
-iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_visible_NAS   -j DNAT --to-destination $NAS:$p_interno_NAS
 
 # Permetre el forwarding dels ports mapejats
 

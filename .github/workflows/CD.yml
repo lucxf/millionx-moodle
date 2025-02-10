@@ -1,6 +1,16 @@
 name: CD
 on:
   workflow_dispatch:
+    inputs:
+      image:
+        type: choice
+        description: 'Image to create'
+        required: true
+        default: 'zabbix-server'
+        options:
+          - 'zabbix-server'
+          - 'zabbix-agent'
+
 env:
   REGISTRY: ghcr.io
 

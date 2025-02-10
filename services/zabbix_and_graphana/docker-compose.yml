@@ -12,7 +12,8 @@ services:
     networks:
       - xarxa_bridge
     ports:
-      - "5756:8080"
+      - "8080:8080"
+      - "10051:10051"
 
 networks:
   xarxa_bridge:

@@ -23,6 +23,8 @@ services:
       - zabbix.env
     networks:
       - xarxa_bridge
+    ports:
+      - "5756:8080"
 
 networks:
   xarxa_bridge:

@@ -3,13 +3,15 @@ FROM nginx:latest
 
 # Instalar herramientas necesarias para descargar e instalar paquetes
 RUN apt-get update -y && \
-    apt-get install -y wget apt-transport-https ca-certificates lsb-release dpkg
+    apt-get install -y wget apt-transport-https ca-certificates lsb-release dpkg gnupg
+
+# Añadir repositorios de Zabbix y actualizar
+RUN wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_7.0+ubuntu24.04_all.deb && \
+    dpkg -i zabbix-release_latest_7.0+ubuntu24.04_all.deb && \
+    apt-get update -y && apt-get upgrade -y
 
 # Instalar Zabbix y dependencias
-RUN wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_7.0+ubuntu24.04_all.deb \
-    && dpkg -i zabbix-release_latest_7.0+ubuntu24.04_all.deb \
-    && apt-get update -y && apt-get upgrade -y \
-    && apt-get install -y zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent mysql-server php8.3-fpm
+RUN apt-get install -y zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent mysql-server php8.3-fpm
 
 # Copiar archivo .env
 COPY .env /root/.env

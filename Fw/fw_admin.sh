@@ -5,7 +5,10 @@ NicExt="ens37"
 
 RedAdministracio="192.168.40.0/24"
 
-puerto_Proxmox_visible="4731"
+puerto_Proxmox_visible_1="4731"
+puerto_Proxmox_visible_2="4732"
+puerto_Proxmox_visible_3="4733"
+puerto_Proxmox_visible_4="4734"
 puerto_Proxmox_original="8006"
 
 proxmox1="192.168.40.11"
@@ -34,21 +37,14 @@ iptables -t nat -A POSTROUTING -d $RedAdministracio -o $vlan40   -j MASQUERADE
 # quan Ip desti = red Interconnexio --> envia per la tarjeta de la red interconnexio NicExt
 iptables -t nat -A POSTROUTING                      -o $NicExt -j MASQUERADE
 
-red10="172.18.0.0/16"
-vlan10="ens33"
-
-red20="172.19.0.0/16"
-vlan20="ens37"
-
-red30="10.0.0.0/20"
-vlan30="ens38"
-
-srvwordpress="172.18.10.4"
-srvodoo="172.18.10.3"
-
 # PREROUTING
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible_1 -j DNAT --to $proxmox1:$puerto_Proxmox_original
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible_2 -j DNAT --to-destination $proxmox2:$puerto_Proxmox_original
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible_3 -j DNAT --to-destination $proxmox3:$puerto_Proxmox_original
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible_4 -j DNAT --to-destination $proxmox4:$puerto_Proxmox_original
 
-iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible -j DNAT --to-destination $proxmox1:$puerto_Proxmox_original
-iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible -j DNAT --to-destination $proxmox2:$puerto_Proxmox_original
-iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible -j DNAT --to-destination $proxmox3:$puerto_Proxmox_original
-iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible -j DNAT --to-destination $proxmox4:$puerto_Proxmox_original
+
+# Permetre el forwarding dels ports mapejats
+
+iptables -A FORWARD -i $NicExt -p tcp --dport $puerto_Proxmox_original -j ACCEPT
+iptables -A FORWARD -o $NicExt -p tcp --sport $puerto_Proxmox_original -j ACCEPT

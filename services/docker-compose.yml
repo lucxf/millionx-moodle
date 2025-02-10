@@ -6,7 +6,7 @@ services:
       image: mariadb
       restart: always
       volumes:
-         - /volums/wordpress-traefik-kuma/nextcloud_db:/var/lib/mysql
+         - /volums/moodle_project/nextcloud_db:/var/lib/mysql
       env_file:
          - nextcloud.env
       networks:
@@ -17,7 +17,7 @@ services:
       container_name: nextcloud
       restart: always
       volumes:
-         - /volums/wordpress-traefik-kuma/NextCloud:/var/www/html
+         - /volums/moodle_project/NextCloud:/var/www/html
       depends_on:
          - nextcloud_db
       env_file:

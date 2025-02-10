@@ -11,10 +11,10 @@ puerto_Proxmox_visible_3="4733"
 puerto_Proxmox_visible_4="4734"
 puerto_Proxmox_original="8006"
 
-proxmox1="192.168.40.11"
-proxmox2="192.168.40.12"
-proxmox3="192.168.40.13"
-proxmox4="192.168.40.14"
+proxmox1="192.168.40.10"
+proxmox2="192.168.40.11"
+proxmox3="192.168.40.12"
+proxmox4="192.168.40.13"
 # Borramos reglas por defecto
 iptables -F
 # Borro todas las reglas NAT

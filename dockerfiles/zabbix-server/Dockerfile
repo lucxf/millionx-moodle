@@ -1,3 +1,3 @@
 From ubuntu:latest
 
-RUN apt-get update && apt-get install -y zabbix-agent
+RUN apt update -y && apt upgrade -y

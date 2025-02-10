@@ -89,7 +89,7 @@ jobs:
         - name: Create Release name
           id: release_tag
           run: |
-            release_name_tag=$(echo "${{ github.ref_name }}-${{needs.create_docker_image.outputs.version}}"| tr '[:upper:]' '[:lower:]' | tr / - ) 
+            release_name_tag=$(echo "${{github.event.inputs.image-to-create}}-${{needs.create_docker_image.outputs.version}}"| tr '[:upper:]' '[:lower:]' | tr / - ) 
             echo "release_name_tag=$release_name_tag" >> $GITHUB_OUTPUT
 
         - name: Create new release

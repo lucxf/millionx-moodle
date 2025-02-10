@@ -13,6 +13,12 @@ log_error() {
     exit 1
 }
 
+
+# Comprobar si el usuario es root
+if [ "$(id -u)" -ne 0 ]; then
+    log_error "Este script debe ser ejecutado como root o con permisos de superusuario."
+fi
+
 # Eliminar archivos de paquetes .deb que ya no se pueden descargar
 echo -e "\033[34mLimpiando paquetes obsoletos...\033[0m"
 if ! sudo apt-get autoclean -y; then

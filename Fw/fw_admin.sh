@@ -38,7 +38,7 @@ iptables -t nat -A POSTROUTING -d $RedAdministracio -o $vlan40   -j MASQUERADE
 iptables -t nat -A POSTROUTING                      -o $NicExt -j MASQUERADE
 
 # PREROUTING
-iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible_1 -j DNAT --to $proxmox1:$puerto_Proxmox_original
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible_1 -j DNAT --to-destination $proxmox1:$puerto_Proxmox_original
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible_2 -j DNAT --to-destination $proxmox2:$puerto_Proxmox_original
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible_3 -j DNAT --to-destination $proxmox3:$puerto_Proxmox_original
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_Proxmox_visible_4 -j DNAT --to-destination $proxmox4:$puerto_Proxmox_original

@@ -41,6 +41,7 @@ iptables -t nat -A POSTROUTING -d $RedAdministracio -o $vlan40   -j MASQUERADE
 # quan Ip desti = red Interconnexio --> envia per la tarjeta de la red interconnexio NicExt
 iptables -t nat -A POSTROUTING                      -o $NicExt -j MASQUERADE
 
+# Se ha de borrar devido a que es una solucion temporal
 # PREROUTING
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_visible_prox1 -j DNAT --to-destination $proxmox1:$p_interno_proxmox
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_visible_prox2 -j DNAT --to-destination $proxmox2:$p_interno_proxmox

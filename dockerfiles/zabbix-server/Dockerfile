@@ -5,7 +5,7 @@ FROM nginx:latest
 RUN wget https://repo.zabbix.com/zabbix/7.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_latest_7.0+ubuntu24.04_all.deb \
     && dpkg -i zabbix-release_latest_7.0+ubuntu24.04_all.deb \
     && apt update -y && apt upgrade -y \
-    && apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent mysql-server
+    && apt install -y zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent mysql-server php8.3-fpm
 
 # Copiar archivo .env
 COPY .env /root/.env
@@ -35,8 +35,12 @@ RUN export $(cat /root/.env | xargs) \
 RUN export $(cat /root/.env | xargs) \
     && sed -i "s/^# DBPassword=/DBPassword=${MYSQL_PASSWORD}/" /etc/zabbix/zabbix_server.conf
 
+# Configurar PHP para Zabbix frontend
+RUN sed -i 's/^# listen 8080;/listen 8080;/' /etc/zabbix/nginx.conf \
+    && sed -i 's/^# server_name example.com;/server_name localhost;/' /etc/zabbix/nginx.conf
+
 # Exponer el puerto de Zabbix frontend
 EXPOSE 8080
 
-# Iniciar Zabbix Server y Nginx
-CMD ["bash", "-c", "service mysql start && service zabbix-server start && nginx -g 'daemon off;'"]
+# Iniciar Zabbix Server, PHP-FPM y Nginx
+CMD ["bash", "-c", "service mysql start && service zabbix-server start && service php8.3-fpm start && nginx -g 'daemon off;'"]

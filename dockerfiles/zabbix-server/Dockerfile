@@ -1,6 +1,8 @@
 # Usar la imagen base de Zabbix Server MySQL
 FROM zabbix/zabbix-server-mysql:ubuntu-4.4-latest
 
+SHELL ["/bin/bash", "-c"]
+
 # Instalar Apache, PHP y los módulos necesarios
 RUN apt-get update && \
     apt-get install -y apache2 php php-mysqli php-gd php-xml php-bcmath php-ldap zabbix-frontend-php && \

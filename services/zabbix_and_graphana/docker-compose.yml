@@ -7,7 +7,7 @@ services:
      restart: always
      ports:
         - "3306:3306"
-     env-file:
+     env_file:
         - zabbix_mysql.env
      volumes:
         - /usr/share/zoneinfo/Europe/Madrid:/etc/localtime
@@ -32,7 +32,6 @@ services:
         - "10051:10051"
      env_file:
         - zabbix_server.env
-
      volumes:
         - /volums/millionx-moodle/zabbix/externalscripts:/usr/lib/zabbix/externalscripts
         - /usr/share/zoneinfo/Europe/Madrid:/etc/localtime

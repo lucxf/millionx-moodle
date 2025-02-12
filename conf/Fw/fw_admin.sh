@@ -46,6 +46,9 @@ iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_visible_prox2 -j DNAT
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_visible_prox3 -j DNAT --to-destination $proxmox3:$p_interno_proxmox
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_visible_prox4 -j DNAT --to-destination $proxmox4:$p_interno_proxmox
 
+# Mapear el ssh para el ubu del wireguard
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport 4000 -j DNAT --to-destination $proxmox1:22
+
 # Permetre el forwarding dels ports mapejats
 
 iptables -A FORWARD -i $NicExt -p tcp --dport $puerto_Proxmox_original -j ACCEPT

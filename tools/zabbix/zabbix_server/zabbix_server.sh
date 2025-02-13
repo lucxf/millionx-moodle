@@ -5,6 +5,9 @@ LOGFILE="/var/log/Project/zabbix_installation.log"
 
 packages_to_install=("zabbix-server-mysql" "zabbix-frontend-php" "zabbix-nginx-conf" "zabbix-sql-scripts" "zabbix-agent")
 
+$MYSQL_USER="ubuser_sql"
+$MYSQL_PASSWORD="123456aA."
+$MYSQL_DB="zabbix_db"
 # Función para escribir errores en el log y mostrar el mensaje en rojo
 log_error() {
     # Registrar el error en el archivo de log
@@ -69,10 +72,10 @@ for package in "${packages_to_install[@]}"; do
 done
 
 # Ejemplo de uso:
-create_mysql_database_user "zabbix_db" "ubuser" "12345aA"
+create_mysql_database_user $MYSQL_DB $MYSQL_USER $MYSQL_PASSWORD
 
 # Importamos el esquema para la base de datos
-if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -uzabbix -p zabbix; then
+if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -u $MYSQL_USER -p $MYSQL_PASSWORD $MYSQL_DB; then
     log_error "Error al importar el esquema para la base de datos."
 fi
 

@@ -3,11 +3,14 @@
 # Archivo de log
 LOGFILE="/var/log/Project/zabbix_installation.log"
 
+# Paquetes a instalar
 packages_to_install=("zabbix-server-mysql" "zabbix-frontend-php" "zabbix-nginx-conf" "zabbix-sql-scripts" "zabbix-agent" "mysql-server")
 
-$MYSQL_USER="ubuser_sql"
-$MYSQL_PASSWORD="123456aA."
-$MYSQL_DB="zabbix_db"
+# Definición de las variables correctamente
+MYSQL_USER="ubuser_sql"
+MYSQL_PASSWORD="123456aA."
+MYSQL_DB="zabbix_db"
+
 # Función para escribir errores en el log y mostrar el mensaje en rojo
 log_error() {
     # Registrar el error en el archivo de log
@@ -18,6 +21,7 @@ log_error() {
     exit 1
 }
 
+# Función para registrar mensajes informativos
 log_info() {
     # Registrar el mensaje informativo en el archivo de log
     echo "$(date) - INFO: $1" | tee -a $LOGFILE
@@ -25,6 +29,7 @@ log_info() {
     echo -e "\033[34m$(date) - INFO: $1\033[0m"
 }
 
+# Función para crear la base de datos y el usuario de MySQL
 create_mysql_database_user() {
     local db_name=$1
     local db_user=$2
@@ -32,14 +37,13 @@ create_mysql_database_user() {
 
     # Ejecutar las operaciones en MySQL y verificar si fallan
     if ! mysql -uroot -p <<EOF
-CREATE DATABASE $db_name CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
-CREATE USER '$db_user'@'localhost' IDENTIFIED BY '$db_password';
+CREATE DATABASE IF NOT EXISTS $db_name DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+CREATE USER IF NOT EXISTS '$db_user'@'localhost' IDENTIFIED BY '$db_password';
 GRANT ALL PRIVILEGES ON $db_name.* TO '$db_user'@'localhost';
 SET GLOBAL log_bin_trust_function_creators = 1;
 EOF
     then
         log_error "Error al ejecutar los comandos MySQL para crear la base de datos $db_name y el usuario $db_user."
-        exit 1
     fi
 }
 
@@ -64,21 +68,17 @@ fi
 
 # Zabbix con mysql y nginx
 log_info "Instalando el servidor, la interfaz y el agente de Zabbix..."
-
 for package in "${packages_to_install[@]}"; do
     if ! apt install -y "$package"; then
         log_error "Error al instalar el paquete: $package"
     fi
 done
 
-# Ejemplo de uso:
-create_mysql_database_user $MYSQL_DB $MYSQL_USER $MYSQL_PASSWORD
+# Crear la base de datos y el usuario en MySQL
+create_mysql_database_user "$MYSQL_DB" "$MYSQL_USER" "$MYSQL_PASSWORD"
 
 # Importamos el esquema para la base de datos
+log_info "Importando el esquema de la base de datos de Zabbix..."
 if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DB"; then
     log_error "Error al importar el esquema para la base de datos."
 fi
-
-
-
-

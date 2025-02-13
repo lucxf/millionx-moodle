@@ -11,6 +11,8 @@ MYSQL_USER="ubuser_sql"
 MYSQL_PASSWORD="123456aA."
 MYSQL_DB="zabbix_db"
 
+MYSQL_CONF_FILE_PATH="/home/lucxf/millionx-moodle/tools/zabbix/zabbix_server/.my.cnf"
+
 # Función para escribir errores en el log y mostrar el mensaje en rojo
 log_error() {
     # Registrar el error en el archivo de log
@@ -79,7 +81,7 @@ create_mysql_database_user "$MYSQL_DB" "$MYSQL_USER" "$MYSQL_PASSWORD"
 
 # Importamos el esquema para la base de datos
 log_info "Importando el esquema de la base de datos de Zabbix..."
-if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --defaults-file=./tools/zabbix/zabbix_server/.my.cnf "$MYSQL_DB"; then
+if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --defaults-file=$MYSQL_CONF_FILE_PATH "$MYSQL_DB"; then
     log_error "Error al importar el esquema para la base de datos."
 fi
 

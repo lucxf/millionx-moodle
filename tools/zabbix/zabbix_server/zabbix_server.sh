@@ -36,7 +36,7 @@ create_mysql_database_user() {
     local db_password=$3
 
     # Ejecutar las operaciones en MySQL y verificar si fallan
-    if ! mysql -uroot -p <<EOF
+    if ! mysql --defaults-file=~/.my.cnf <<EOF
 CREATE DATABASE IF NOT EXISTS $db_name DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 CREATE USER IF NOT EXISTS '$db_user'@'localhost' IDENTIFIED BY '$db_password';
 GRANT ALL PRIVILEGES ON $db_name.* TO '$db_user'@'localhost';
@@ -79,6 +79,8 @@ create_mysql_database_user "$MYSQL_DB" "$MYSQL_USER" "$MYSQL_PASSWORD"
 
 # Importamos el esquema para la base de datos
 log_info "Importando el esquema de la base de datos de Zabbix..."
-if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DB"; then
+if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --defaults-file=./tools/zabbix/zabbix_server/.my.cnf "$MYSQL_DB"; then
     log_error "Error al importar el esquema para la base de datos."
 fi
+
+log_info "Instalación de Zabbix completada correctamente."

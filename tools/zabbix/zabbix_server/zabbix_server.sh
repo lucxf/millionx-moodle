@@ -3,7 +3,7 @@
 # Archivo de log
 LOGFILE="/var/log/Project/zabbix_installation.log"
 
-packages_to_install=("zabbix-server-mysql" "zabbix-frontend-php" "zabbix-nginx-conf" "zabbix-sql-scripts" "zabbix-agent")
+packages_to_install=("zabbix-server-mysql" "zabbix-frontend-php" "zabbix-nginx-conf" "zabbix-sql-scripts" "zabbix-agent" "mysql-server")
 
 $MYSQL_USER="ubuser_sql"
 $MYSQL_PASSWORD="123456aA."

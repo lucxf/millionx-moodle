@@ -41,7 +41,7 @@ read -r install_type
 if [ "$install_type" -eq 1 ]; then
     # Instalar Zabbix Server, Frontend y Agent
     log_info "Instalando Zabbix Server, Frontend y Agent..."
-    chmod +x ./tools/zabbix/zabbix_server.sh
+    chmod +x ./tools/zabbix/zabbix_server/zabbix_server.sh
     if ! sudo ./tools/zabbix/zabbix_server/zabbix_server.sh; then
         log_error "Error al instalar Zabbix Server, Frontend y Agent."
     fi

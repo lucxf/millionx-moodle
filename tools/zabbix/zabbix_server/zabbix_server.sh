@@ -75,7 +75,7 @@ done
 create_mysql_database_user $MYSQL_DB $MYSQL_USER $MYSQL_PASSWORD
 
 # Importamos el esquema para la base de datos
-if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -u $MYSQL_USER -p $MYSQL_PASSWORD $MYSQL_DB; then
+if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --default-character-set=utf8mb4 -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DB"; then
     log_error "Error al importar el esquema para la base de datos."
 fi
 

@@ -32,13 +32,6 @@ if ! apt update -y && apt upgrade -y; then
     log_error "Error al actualizar el sistema."
 fi
 
-# # Zabbix con mysql y nginx
-# log_info "Instalando el servidor, la interfaz y el agente de Zabbix..."
-# for package in "${packages_to_install[@]}"; do
-#     if ! apt install -y "$package"; then
-#         log_error "Error al instalar el paquete: $package"
-#     fi
-# done
 
 # apt install zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent
 
@@ -73,3 +66,7 @@ else
     log_info "Configuracion de PostgreSQL completada correctamente."
 
 fi
+
+log_info "configurando zabbix server..."
+
+config_zabbix_server "$MYSQL_DB" "$MYSQL_USER" "$MYSQL_PASSWORD"

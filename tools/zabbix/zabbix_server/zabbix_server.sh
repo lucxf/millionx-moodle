@@ -59,3 +59,5 @@ if [ "$db_type" -eq 1 ]; then
 else
 
     log_info "Configuracion de PostgreSQL completada correctamente."
+
+fi

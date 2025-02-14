@@ -8,8 +8,8 @@
 packages_to_install=("zabbix-server-mysql" "zabbix-frontend-php" "zabbix-nginx-conf" "zabbix-sql-scripts" "zabbix-agent" "mysql-server")
 
 # Definición de las variables correctamente
-MYSQL_USER="ubuser_sql"
-MYSQL_PASSWORD="123456aA."
+MYSQL_USER="lucxf"
+MYSQL_PASSWORD="lluc2005"
 MYSQL_DB="zabbix_db"
 
 

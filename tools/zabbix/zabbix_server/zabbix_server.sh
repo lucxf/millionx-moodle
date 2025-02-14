@@ -3,6 +3,7 @@
 # Importamos funciones de lib.sh
 . ./tools/lib.sh
 . ./tools/zabbix/zabbix_server/BBDD/mysql.sh
+. ./tools/zabbix/zabbix_server/WebServers/nginx.sh
 
 # Paquetes a instalar
 packages_to_install=("zabbix-server-mysql" "zabbix-frontend-php" "zabbix-nginx-conf" "zabbix-sql-scripts" "zabbix-agent" "mysql-server")
@@ -66,6 +67,10 @@ else
     log_info "Configuracion de PostgreSQL completada correctamente."
 
 fi
+
+config_zabbix_php_nginx
+
+start_zabbix_services
 
 log_info "configurando zabbix server..."
 

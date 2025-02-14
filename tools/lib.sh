@@ -40,4 +40,6 @@ install_packages() {
             log_error "Error al instalar el paquete: $package"
         fi
     done
+
+    log_info "Los paquetes se han instalado correctamente."
 }

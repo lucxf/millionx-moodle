@@ -48,9 +48,6 @@ fi
 # Nginx: zabbix-nginx-conf 
 # Apache: zabbix-apache-conf
 
-# Paquetes a instalar (como una cadena de texto)
-basic_packages="zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent mysql-server"
-
 # Llamar a la función para instalar los paquetes
 install_packages "$packages_to_install"
 

@@ -30,9 +30,9 @@ log_info() {
     echo -e "\033[$green$(date) - INFO: $1\033[0m"
 }
 
+# Función para instalar paquetes y manejar errores
 install_packages() {
-    local packages="$1"  # Recibe el listado de paquetes como una cadena de texto
-    IFS=' ' read -r -a package_array <<< "$packages"  # Convierte la cadena en un arreglo
+    local package_array=("$@")  # Recibe el arreglo de paquetes como argumento
 
     log_info "Instalando los paquetes..."
     for package in "${package_array[@]}"; do

@@ -68,8 +68,9 @@ else
 
 fi
 
+log_info "Configurando PHP para Zabbix frontend..."
 config_zabbix_php_nginx
-
+log_info "Starting Zabbix..."
 start_zabbix_services
 
 log_info "configurando zabbix server..."

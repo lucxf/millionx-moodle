@@ -40,17 +40,22 @@ for package in "${packages_to_install[@]}"; do
     fi
 done
 
-log_info "Configurando MySQL..."
-chmod +x ./tools/zabbix/zabbix_server/BBDD/mysql.sh
 
-if ! sudo ./tools/zabbix/zabbix_server/BBDD/mysql.sh; then
-    log_error "Error al configurar MySQL."
-fi
+log_info "Selecciona base de datos a usar:"
+echo "1 - MySQL"
+echo "2 - PostgreSQL"
+read -r db_type
 
-# Importamos el esquema para la base de datos
-log_info "Importando el esquema de la base de datos de Zabbix..."
-if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --defaults-file=~/.my.cnf "$MYSQL_DB"; then
-    log_error "Error al importar el esquema para la base de datos."
-fi
+if [ "$db_type" -eq 1 ]; then
 
-log_info "Instalación de Zabbix completada correctamente."
+    log_info "Configurando MySQL..."
+
+    create_mysql_database_user "$MYSQL_DB" "$MYSQL_USER" "$MYSQL_PASSWORD"
+
+    imoport_mysql_schema
+
+    log_info "Configuracion de MySQL completada correctamente."
+
+else
+
+    log_info "Configuracion de PostgreSQL completada correctamente."

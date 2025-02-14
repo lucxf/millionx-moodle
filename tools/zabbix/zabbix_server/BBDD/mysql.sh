@@ -36,11 +36,10 @@ EOF
     fi
 }
 
-# Crear la base de datos y el usuario en MySQL
-create_mysql_database_user "$MYSQL_DB" "$MYSQL_USER" "$MYSQL_PASSWORD"
-
-# Importamos el esquema para la base de datos
-log_info "Importando el esquema de la base de datos de Zabbix..."
-if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --defaults-file=~/.my.cnf "$MYSQL_DB"; then
-    log_error "Error al importar el esquema para la base de datos."
-fi
+imoport_mysql_schema() {
+    # Importamos el esquema para la base de datos
+    log_info "Importando el esquema de la base de datos de Zabbix..."
+    if ! zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz | mysql --defaults-file=~/.my.cnf "$MYSQL_DB"; then
+        log_error "Error al importar el esquema para la base de datos."
+    fi
+}

@@ -69,4 +69,4 @@ fi
 
 log_info "configurando zabbix server..."
 
-config_zabbix_server "$MYSQL_DB" "$MYSQL_USER" "$MYSQL_PASSWORD"
+# config_zabbix_server "$MYSQL_DB" "$MYSQL_USER" "$MYSQL_PASSWORD"

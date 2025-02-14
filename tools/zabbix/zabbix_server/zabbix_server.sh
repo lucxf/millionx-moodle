@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Archivo de log
-LOGFILE="/var/log/Project/zabbix_installation.log"
+# Importamos funciones de lib.sh
+. ./tools/lib.sh
 
 # Paquetes a instalar
 packages_to_install=("zabbix-server-mysql" "zabbix-frontend-php" "zabbix-nginx-conf" "zabbix-sql-scripts" "zabbix-agent" "mysql-server")
@@ -13,23 +13,24 @@ MYSQL_DB="zabbix_db"
 
 MYSQL_CONF_FILE_PATH="/home/lucxf/millionx-moodle/tools/zabbix/zabbix_server/.my.cnf"
 
-# Función para escribir errores en el log y mostrar el mensaje en rojo
-log_error() {
-    # Registrar el error en el archivo de log
-    echo "$(date) - ERROR: $1" | tee -a $LOGFILE
-    # Mostrar el error en la terminal en rojo
-    echo -e "\033[31m$(date) - ERROR: $1\033[0m"
-    # Detener la ejecución del script
-    exit 1
-}
 
-# Función para registrar mensajes informativos
-log_info() {
-    # Registrar el mensaje informativo en el archivo de log
-    echo "$(date) - INFO: $1" | tee -a $LOGFILE
-    # Mostrar el mensaje en la terminal en azul
-    echo -e "\033[34m$(date) - INFO: $1\033[0m"
-}
+# Función para escribir errores en el log y mostrar el mensaje en rojo
+# log_error() {
+#     # Registrar el error en el archivo de log
+#     echo "$(date) - ERROR: $1" | tee -a $LOGFILE
+#     # Mostrar el error en la terminal en rojo
+#     echo -e "\033[31m$(date) - ERROR: $1\033[0m"
+#     # Detener la ejecución del script
+#     exit 1
+# }
+
+# # Función para registrar mensajes informativos
+# log_info() {
+#     # Registrar el mensaje informativo en el archivo de log
+#     echo "$(date) - INFO: $1" | tee -a $LOGFILE
+#     # Mostrar el mensaje en la terminal en azul
+#     echo -e "\033[34m$(date) - INFO: $1\033[0m"
+# }
 
 # Función para crear la base de datos y el usuario de MySQL
 # create_mysql_database_user() {

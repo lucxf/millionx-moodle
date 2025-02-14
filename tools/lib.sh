@@ -29,3 +29,15 @@ log_info() {
     # Mostrar el mensaje en la terminal en verde
     echo -e "\033[$green$(date) - INFO: $1\033[0m"
 }
+
+install_packages() {
+    local packages="$1"  # Recibe el listado de paquetes como una cadena de texto
+    IFS=' ' read -r -a package_array <<< "$packages"  # Convierte la cadena en un arreglo
+
+    log_info "Instalando los paquetes..."
+    for package in "${package_array[@]}"; do
+        if ! apt install -y "$package"; then
+            log_error "Error al instalar el paquete: $package"
+        fi
+    done
+}

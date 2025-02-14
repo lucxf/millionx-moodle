@@ -32,14 +32,27 @@ if ! apt update -y && apt upgrade -y; then
     log_error "Error al actualizar el sistema."
 fi
 
-# Zabbix con mysql y nginx
-log_info "Instalando el servidor, la interfaz y el agente de Zabbix..."
-for package in "${packages_to_install[@]}"; do
-    if ! apt install -y "$package"; then
-        log_error "Error al instalar el paquete: $package"
-    fi
-done
+# # Zabbix con mysql y nginx
+# log_info "Instalando el servidor, la interfaz y el agente de Zabbix..."
+# for package in "${packages_to_install[@]}"; do
+#     if ! apt install -y "$package"; then
+#         log_error "Error al instalar el paquete: $package"
+#     fi
+# done
 
+# apt install zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent
+
+# MySQL: zabbix-server-MySQL 
+# PostgresSQL: zabbix-server-pgsql php8.3-pgsql
+
+# Nginx: zabbix-nginx-conf 
+# Apache: zabbix-apache-conf
+
+# Paquetes a instalar (como una cadena de texto)
+basic_packages="zabbix-server-mysql zabbix-frontend-php zabbix-nginx-conf zabbix-sql-scripts zabbix-agent mysql-server"
+
+# Llamar a la función para instalar los paquetes
+install_packages "$packages_to_install"
 
 log_info "Selecciona base de datos a usar:"
 echo "1 - MySQL"

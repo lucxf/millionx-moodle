@@ -8,7 +8,7 @@
 packages_to_install=("zabbix-server-mysql" "zabbix-frontend-php" "zabbix-nginx-conf" "zabbix-sql-scripts" "zabbix-agent" "mysql-server")
 
 # Definición de las variables correctamente
-MYSQL_USER="lucxf"
+MYSQL_USER="root"
 MYSQL_PASSWORD="lluc2005"
 MYSQL_DB="zabbix_db"
 
@@ -66,6 +66,8 @@ if [ "$db_type" -eq 1 ]; then
     create_mysql_database_user "$MYSQL_DB" "$MYSQL_USER" "$MYSQL_PASSWORD"
 
     imoport_mysql_schema
+
+    disable_log_bin_trust_function_creators
 
     log_info "Configuracion de MySQL completada correctamente."
 

@@ -43,3 +43,15 @@ imoport_mysql_schema() {
         log_error "Error al importar el esquema para la base de datos."
     fi
 }
+
+# Función para deshabilitar log_bin_trust_function_creators después de importar el esquema
+disable_log_bin_trust_function_creators() {
+    log_info "Deshabilitando la opción log_bin_trust_function_creators en MySQL..."
+
+    # Ejecutar el comando MySQL para deshabilitar la opción
+    if ! mysql --defaults-file=~/.my.cnf -e "SET GLOBAL log_bin_trust_function_creators = 0;"; then
+        log_error "Error al deshabilitar la opción log_bin_trust_function_creators."
+    fi
+
+    log_info "Opción log_bin_trust_function_creators deshabilitada correctamente."
+}

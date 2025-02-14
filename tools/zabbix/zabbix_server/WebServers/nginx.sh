@@ -13,8 +13,8 @@ config_zabbix_php_nginx() {
     log_info "Configurando $config_file: descomentando y configurando listen y server_name..."
 
     # Usar sed para descomentar y configurar las directivas listen y server_name
-    if sudo sed -i 's/^# listen 8080;/listen 8080;/' "$config_file" && \
-       sudo sed -i 's/^# server_name example.com;/server_name example.com;/' "$config_file"; then
+    if sudo sed -i 's/^listen 8080;/listen 8080;/' "$config_file" && \
+       sudo sed -i 's/^server_name example.com;/server_name example.com;/' "$config_file"; then
         log_info "La configuración de listen y server_name se ha actualizado correctamente en $config_file."
     else
         log_error "Error al modificar las directivas listen y server_name en $config_file."

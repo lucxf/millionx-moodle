@@ -42,7 +42,7 @@ fi
 # Apache: zabbix-apache-conf
 
 # Llamar a la función para instalar los paquetes
-install_packages "$packages_to_install"
+install_packages "${packages_to_install[@]}"
 
 log_info "Selecciona base de datos a usar:"
 echo "1 - MySQL"

@@ -45,12 +45,13 @@ install_packages() {
 }
 
 config_zabbix_server() {
-    local config_file="	/etc/zabbix/zabbix_server.conf "
+    local config_file="/etc/zabbix/zabbix_server.conf"
     local db_name="$1"    # El nuevo valor para DBName
     local db_user="$2"    # El nuevo valor para DBUser
     local db_password="$3"  # El nuevo valor para DBPassword
 
     # Verificar si el archivo existe
+    log_info "Verificando la existencia de $config_file..."
     if [ ! -f "$config_file" ]; then
         log_error "El archivo $config_file no existe."
         exit 1

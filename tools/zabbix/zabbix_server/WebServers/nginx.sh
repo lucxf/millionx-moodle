@@ -25,13 +25,13 @@ config_zabbix_php_nginx() {
 start_zabbix_services() {
     log_info "Reiniciando los servicios de Zabbix, Nginx y PHP-FPM..."
 
-    # Reiniciar los servicios
-    if sudo systemctl restart zabbix-server zabbix-agent nginx php8.3-fpm; then
-        log_info "Los servicios de Zabbix, Nginx y PHP-FPM han sido reiniciados correctamente."
-    else
-        log_error "Error al reiniciar los servicios de Zabbix, Nginx y PHP-FPM."
-        exit 1
-    fi
+    # # Reiniciar los servicios
+    # if sudo systemctl restart zabbix-server zabbix-agent nginx php8.3-fpm; then
+    #     log_info "Los servicios de Zabbix, Nginx y PHP-FPM han sido reiniciados correctamente."
+    # else
+    #     log_error "Error al reiniciar los servicios de Zabbix, Nginx y PHP-FPM."
+    #     exit 1
+    # fi
 
     log_info "Habilitando los servicios de Zabbix, Nginx y PHP-FPM para que se inicien al arranque..."
 

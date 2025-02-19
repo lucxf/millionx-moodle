@@ -285,14 +285,14 @@ EOF
     #------------------------------------
     # Step 10: Installation Complete
     #------------------------------------
-    log_info "Installation completed successfully!"
-    log_info "Please access Zabbix UI at: http://${DOMAIN_NAME}:${LISTEN_PORT}"
-    log_info "Default credentials:"
-    log_info "Username: Admin"
-    log_info "Password: zabbix"
-    log_info "MySQL root password: ${MYSQL_ROOT_PASSWORD}"
-    log_info "Zabbix database password: ${ZABBIX_DB_PASSWORD}"
-    log_info "Please save these passwords in a secure location."
+    echo "\033[$yellow Installation completed successfully!\033[0m"
+    echo "Please access Zabbix UI at:\033[$yellow http://${DOMAIN_NAME}:${LISTEN_PORT}\033[0m"
+    echo "\033[$green Default credentials:\033[0m"
+    echo "Username: \033[$yellow Admin\033[0m"
+    echo "Password: \033[$yellow zabbix\033[0m"
+    echo "MySQL root password:\033[$yellow ${MYSQL_ROOT_PASSWORD}\033[0m"
+    echo "Zabbix database password:\033[$yellow ${ZABBIX_DB_PASSWORD}\033[0m"
+    echo "\033[$red Please save these passwords in a secure location.\033[0m"
 
 } || {
     # Error handler for the entire installation block

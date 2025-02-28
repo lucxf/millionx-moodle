@@ -24,7 +24,5 @@ iptables -t nat -A POSTROUTING -s $RedInterna -o $NicExt -j MASQUERADE
 # Mapeamos puertos del wireguard
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $wireguardWeb -j DNAT --to-destination $wireguardSRV:$wireguardWeb
 
-# Hacer el forwarding del puerto del wireguard 51820 udp
+iptables -t nat -A PREROUTING -i $NicExt -p udp --dport $wg_port      -j DNAT --to-destination $wireguardSRV:$wg_port
 
-iptables -A FORWARD -i $NicExt -p udp --dport $wg_port -j ACCEPT
-iptables -A FORWARD -o $NicExt -p udp --sport $wg_port -j ACCEPT

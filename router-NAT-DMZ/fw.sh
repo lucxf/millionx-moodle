@@ -5,12 +5,16 @@ vlan20="ens38"
 vlan60="ens37"
 
 RedInterconexio="192.168.60.0/24"
-RedLAN="10.0.0.0/8"
 RedDMZ="192.168.20.0/24"
 
-puerto_dns_visible="2333"
-dnsserver="192.168.20.241"
-puerto_dns_original="10000"
+# VPN
+p_VPN_web="51820"
+p_VPN_udp_traffic="51821"
+vpn_server="192.168.20.5"
+
+# puerto_dnserver_visible="2333"
+# dnsserver="192.168.20.241"
+# puerto_dnserver_original="10000"
 
 # Dirección IP de la interfaz ens33
 IP_NicExt="172.30.10.13"
@@ -26,28 +30,29 @@ iptables -P INPUT   ACCEPT
 iptables -P OUTPUT  ACCEPT
 iptables -P FORWARD ACCEPT
 
-##########################################################################################################
+# Aplicamos NAT
+iptables -t nat -A POSTROUTING -s $RedDMZ          -o $NicExt -j MASQUERADE
+iptables -t nat -A POSTROUTING -s $RedInterconexio -o $NicExt -j MASQUERADE
 
-# APLICAMOS NAT
+###################################################################################
+###################################################################################
 
-# NAT para las redes
-iptables -t nat -A POSTROUTING -d $RedInterconexio -o $vlan60 -j MASQUERADE
-iptables -t nat -A POSTROUTING -d $RedLAN -o $vlan60 -j MASQUERADE
-iptables -t nat -A POSTROUTING -d $RedDMZ -o $vlan20 -j MASQUERADE
+# VPN
+# Prerouting de la VPN
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport 51821 -j DNAT --to-destination 192.168.40.2:51821
 
-# Redireccionamiento del tráfico de vlan60 a ens33
-iptables -t nat -A PREROUTING -i $vlan60 -j DNAT --to-destination $IP_NicExt
-iptables -A FORWARD -i $vlan60 -o $NicExt -j ACCEPT
-iptables -A FORWARD -i $NicExt -o $vlan60 -j ACCEPT
+iptables -t nat -A PREROUTING -i $NicExt -p udp --dport 51820 -j DNAT --to-destination 192.168.40.2:51820
 
-# Redireccionamiento del tráfico de vlan20 a ens33
-iptables -t nat -A PREROUTING -i $vlan20 -j DNAT --to-destination $IP_NicExt
-iptables -A FORWARD -i $vlan20 -o $NicExt -j ACCEPT
-iptables -A FORWARD -i $NicExt -o $vlan20 -j ACCEPT
+# Permetre el forwarding dels ports mapejats
+iptables -A FORWARD -i $NicExt -p udp --dport $p_VPN_udp_traffic  -j ACCEPT
+iptables -A FORWARD -o $NicExt -p udp --sport $p_VPN_udp_traffic  -j ACCEPT
 
-# Mapeo puertos DNS Server
+iptables -A FORWARD -i $NicExt -p tcp --dport $p_VPN_web          -j ACCEPT
+iptables -A FORWARD -o $NicExt -p tcp --sport $p_VPN_web          -j ACCEPT
+# # Mapeo puertos DNS Server
 
-iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_dns_visible -j DNAT --to-destination $dnsserver:$puerto_dns_original
+# iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_dnserver_visible -j DNAT --to-destination $dnsserver:$puerto_dnserver_original
 
-iptables -A FORWARD -i $NicExt -p tcp --dport $puerto_dns_original -j ACCEPT
-iptables -A FORWARD -o $NicExt -p tcp --sport $puerto_dns_original -j ACCEPT
+# iptables -A FORWARD -i $NicExt -p tcp --dport $puerto_dnserver_original -j ACCEPT
+# iptables -A FORWARD -o $NicExt -p tcp --sport $puerto_dnserver_original -j ACCEPT
+

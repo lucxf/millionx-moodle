@@ -19,7 +19,7 @@ p_VPN_udp_traffic="51821"
 vpn_server="192.168.40.2"
 
 # MACs SSH
-mac_Lluc=""
+mac_Lluc=" 74:56:3C:07:E7:2A"
 mac_Eric=""
 mac_Marc=""
 mac_Ania=""

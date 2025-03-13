@@ -19,3 +19,11 @@ Servicios empleados
 ## DNS
 
 ## NextCloud
+
+---
+
+# How to adminstrate serivces?
+
+In order to adminstrate the services in the networks we have designed, we will have 3 VPN servers where we will be able to connect to.
+
+## VPN Servers with docker

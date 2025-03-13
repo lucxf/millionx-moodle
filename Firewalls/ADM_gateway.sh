@@ -97,5 +97,5 @@ iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p udp --sport $p
 for mac in ${macs_ssh[@]}; 
 do
     iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -m mac --mac-source $mac -j ACCEPT
-    iptables -A OUTPUT -i $vlan40 -p tcp --sport $p_SSH -m mac --mac-source $mac -j ACCEPT
+    iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -m mac --mac-source $mac -j ACCEPT
 done

@@ -35,13 +35,12 @@ iptables -t nat -F
 # Borro reglas de filtrado
 iptables -X
 iptables -Z
-
 # Por defecto todo ACCEPT de momento
-iptables -P INPUT   ACCEPT
-iptables -P OUTPUT  ACCEPT
-iptables -P FORWARD ACCEPT
+iptables -P INPUT   DROP
+iptables -P OUTPUT  DROP
+iptables -P FORWARD DROP
 
-#### Reglas de entrutamiento ####
+#=================== NAT ====================#
 
 # Si Ip origen = Exterior y Ip destino = Red de administarcion lo envio al a VLAN40
 iptables -t nat -A POSTROUTING -d $RedAdministracio -o $vlan40 -j MASQUERADE

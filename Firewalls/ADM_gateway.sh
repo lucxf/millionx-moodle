@@ -62,8 +62,8 @@ iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp -m multiport --dports $p_http,$
 iptables -A INPUT  -i $NicExt -p icmp --icmp-type echo-request -j ACCEPT
 iptables -A OUTPUT -o $NicExt -p icmp --icmp-type echo-reply   -j ACCEPT
 
-iptables -A OUTPUT -i $vlan40 -p icmp --icmp-type echo-request -j ACCEPT
-iptables -A INPUT  -o $vlan40 -p icmp --icmp-type echo-reply   -j ACCEPT
+iptables -A OUTPUT -o $vlan40 -p icmp --icmp-type echo-request -j ACCEPT
+iptables -A INPUT  -i $vlan40 -p icmp --icmp-type echo-reply   -j ACCEPT
 
 iptables -A FORWARD -p icmp --icmp-type echo-request -j ACCEPT
 iptables -A FORWARD -p icmp --icmp-type echo-reply   -j ACCEPT
@@ -124,5 +124,5 @@ iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_Proxmox_visible_2 -j 
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_Proxmox_visible_3 -j DNAT --to-destination $proxmox3:$p_Proxmox_original
 iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_Proxmox_visible_4 -j DNAT --to-destination $proxmox4:$p_Proxmox_original
 
-iptables -A FORWARD -i $NicExt -p tcp --dport $p_Proxmox_original -j ACCEPT
-iptables -A FORWARD -o $NicExt -p tcp --sport $p_Proxmox_original -j ACCEPT
+iptables -A FORWARD -i $vlan40 -o $NicExt -p tcp --dport $p_Proxmox_original -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp --sport $p_Proxmox_original -j ACCEPT

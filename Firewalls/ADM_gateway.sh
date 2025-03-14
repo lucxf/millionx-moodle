@@ -62,16 +62,6 @@ iptables -t nat -A POSTROUTING -d $RedAdministracio -o $vlan40 -j MASQUERADE
 # Si Ip origen = Red de administarcion y Ip destino = Exterior lo envio a la tarjeta externa
 iptables -t nat -A POSTROUTING -s $RedAdministracio -o $NicExt -j MASQUERADE
 
-#================ UPDATE/UPGRADE ====================#
-
-# ROUTER (mirar como hacer que solo se a los repos, no a otro lado)
-iptables -A OUTPUT -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
-iptables -A INPUT  -i $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
-
-# VLAN40 (Permito el forwarding de tramas desde la VLAN40)
-iptables -A FORWARD -i $vlan40 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
-iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
-
 #======================= ICMP =======================#
 
 iptables -A INPUT  -i $NicExt -p icmp --icmp-type echo-request -j ACCEPT
@@ -85,13 +75,23 @@ iptables -A FORWARD -p icmp --icmp-type echo-reply   -j ACCEPT
 
 #======================= DNS =======================#
 
-# ROUTER
+# # ROUTER
 iptables -A OUTPUT -o $NicExt -p udp --dport $p_DNS -j ACCEPT
 iptables -A INPUT  -i $NicExt -p udp --sport $p_DNS -j ACCEPT
 
-# VLAN40
+# # VLAN40
 iptables -A FORWARD -i $vlan40 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
 iptables -A FORWARD -i $NicExt -o $vlan40 -p udp --sport $p_DNS -j ACCEPT
+
+#================ UPDATE/UPGRADE ====================#
+
+# ROUTER (mirar como hacer que solo se a los repos, no a otro lado)
+iptables -A OUTPUT -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
+iptables -A INPUT  -i $NicExt -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
+
+# VLAN40 (Permito el forwarding de tramas desde la VLAN40)
+iptables -A FORWARD -i $vlan40 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
 
 #======================= VPN =======================#
 
@@ -117,6 +117,12 @@ iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p udp --sport $p
 
 iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
 iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT
+
+#=============== TRAFICO LOOPBACK ===================#
+
+# Permitir tráfico local (loopback)
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
 
 #======================= PROXMOX =======================#
 

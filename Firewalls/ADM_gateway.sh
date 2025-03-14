@@ -8,7 +8,7 @@ NicExt="ens37"
 RedAdministracio="192.168.40.0/24"
 
 # Puertos
-p_ssh="22"
+p_SSH="22"
 p_http="80"
 p_https="443"
 p_DNS="53"
@@ -19,7 +19,7 @@ p_VPN_udp_traffic="51821"
 vpn_server="192.168.40.2"
 
 # MACs SSH
-mac_Lluc=" 74:56:3C:07:E7:2A"
+mac_Lluc="F4:6D:3F:9E:05:5C"
 mac_Eric=""
 mac_Marc=""
 mac_Ania=""
@@ -59,11 +59,11 @@ iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp -m multiport --dports $p_http,$
 
 #======================= ICMP =======================#
 
-iptables -A INPUT  -p icmp --icmp-type echo-request -j ACCEPT
-iptables -A OUTPUT -p icmp --icmp-type echo-reply   -j ACCEPT
+iptables -A INPUT  -i $NicExt -p icmp --icmp-type echo-request -j ACCEPT
+iptables -A OUTPUT -o $NicExt -p icmp --icmp-type echo-reply   -j ACCEPT
 
-iptables -A OUTPUT -p icmp --icmp-type echo-request -j ACCEPT
-iptables -A INPUT  -p icmp --icmp-type echo-reply   -j ACCEPT
+iptables -A OUTPUT -i $vlan40 -p icmp --icmp-type echo-request -j ACCEPT
+iptables -A INPUT  -o $vlan40 -p icmp --icmp-type echo-reply   -j ACCEPT
 
 iptables -A FORWARD -p icmp --icmp-type echo-request -j ACCEPT
 iptables -A FORWARD -p icmp --icmp-type echo-reply   -j ACCEPT
@@ -81,9 +81,9 @@ iptables -A FORWARD -i $NicExt -o $vlan40 -p udp --sport $p_DNS -j ACCEPT
 #======================= VPN =======================#
 
 # VPN web config
-iptbales -t nat -A PREROUTING  -i $NicExt     -p tcp --dport $p_VPN_web -j DNAT --to-destination $vpn_server:$p_VPN_web
+iptables -t nat -A PREROUTING  -i $NicExt     -p tcp --dport $p_VPN_web -j DNAT --to-destination $vpn_server:$p_VPN_web
 
-iptbales -A FORWARD -i $NicExt -o $vlan40 -d $RedAdministracio -p tcp --dport $p_VPN_web -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan40 -d $RedAdministracio -p tcp --dport $p_VPN_web -j ACCEPT
 iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p tcp --sport $p_VPN_web -j ACCEPT
 
 # VPN traffic
@@ -94,8 +94,11 @@ iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p udp --sport $p
 
 #======================= SSH =======================#
 
-for mac in ${macs_ssh[@]}; 
-do
-    iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -m mac --mac-source $mac -j ACCEPT
-    iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -m mac --mac-source $mac -j ACCEPT
-done
+# for mac in ${macs_ssh[@]};
+# do
+#     iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -m mac --mac-source $mac -j ACCEPT
+#     iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -m mac --mac-source $mac -j ACCEPT
+# done
+
+iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
+iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT

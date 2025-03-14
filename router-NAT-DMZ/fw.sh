@@ -8,10 +8,14 @@ RedInterconexio="192.168.60.0/24"
 RedDMZ="192.168.20.0/24"
 
 # VPN
+# DMZ
 p_VPN_web="51820"
 p_VPN_udp_traffic="51821"
-vpn_server="192.168.20.5"
-
+vpn_server_DMZ="192.168.20.5"
+# LAN
+p_VPN_web_LAN="3333"
+p_VPN_udp_traffic_LAN="2222"
+router_LAN="192.168.20.2"
 # puerto_dnserver_visible="2333"
 # dnsserver="192.168.20.241"
 # puerto_dnserver_original="10000"
@@ -39,9 +43,14 @@ iptables -t nat -A POSTROUTING -s $RedInterconexio -o $NicExt -j MASQUERADE
 
 # VPN
 # Prerouting de la VPN
-iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport 51821 -j DNAT --to-destination 192.168.40.2:51821
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_VPN_web         -j DNAT --to-destination $vpn_server_DMZ:$p_VPN_web
 
-iptables -t nat -A PREROUTING -i $NicExt -p udp --dport 51820 -j DNAT --to-destination 192.168.40.2:51820
+iptables -t nat -A PREROUTING -i $NicExt -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server_DMZ:$p_VPN_udp_traffic
+
+# Prerouting de la VPN
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_VPN_web_LAN         -j DNAT --to-destination $router_LAN:$p_VPN_web
+
+iptables -t nat -A PREROUTING -i $NicExt -p udp --dport $p_VPN_udp_traffic_LAN -j DNAT --to-destination $router_LAN:$p_VPN_udp_traffic
 
 # Permetre el forwarding dels ports mapejats
 iptables -A FORWARD -i $NicExt -p udp --dport $p_VPN_udp_traffic  -j ACCEPT
@@ -49,6 +58,12 @@ iptables -A FORWARD -o $NicExt -p udp --sport $p_VPN_udp_traffic  -j ACCEPT
 
 iptables -A FORWARD -i $NicExt -p tcp --dport $p_VPN_web          -j ACCEPT
 iptables -A FORWARD -o $NicExt -p tcp --sport $p_VPN_web          -j ACCEPT
+
+iptables -A FORWARD -i $NicExt -p udp --dport $p_VPN_udp_traffic_LAN -j ACCEPT
+iptables -A FORWARD -o $NicExt -p udp --sport $p_VPN_udp_traffic_LAN -j ACCEPT
+
+iptables -A FORWARD -i $NicExt -p tcp --dport $p_VPN_web_LAN -j ACCEPT
+iptables -A FORWARD -o $NicExt -p tcp --sport $p_VPN_web_LAN -j ACCEPT
 # # Mapeo puertos DNS Server
 
 # iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $puerto_dnserver_visible -j DNAT --to-destination $dnsserver:$puerto_dnserver_original

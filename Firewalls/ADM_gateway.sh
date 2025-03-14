@@ -102,3 +102,27 @@ iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p udp --sport $p
 
 iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
 iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT
+
+#======================= PROXMOX =======================#
+
+# Proxmox
+p_Proxmox_original="8006"
+
+p_Proxmox_visible_1="4731"
+p_Proxmox_visible_2="4732"
+p_Proxmox_visible_3="4733"
+p_Proxmox_visible_4="4734"
+
+proxmox1="192.168.40.10"
+proxmox2="192.168.40.11"
+proxmox3="192.168.40.12"
+proxmox4="192.168.40.13"
+
+# Prerouting de proxmox
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_Proxmox_visible_1 -j DNAT --to-destination $proxmox1:$p_Proxmox_original
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_Proxmox_visible_2 -j DNAT --to-destination $proxmox2:$p_Proxmox_original
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_Proxmox_visible_3 -j DNAT --to-destination $proxmox3:$p_Proxmox_original
+iptables -t nat -A PREROUTING -i $NicExt -p tcp --dport $p_Proxmox_visible_4 -j DNAT --to-destination $proxmox4:$p_Proxmox_original
+
+iptables -A FORWARD -i $NicExt -p tcp --dport $p_Proxmox_original -j ACCEPT
+iptables -A FORWARD -o $NicExt -p tcp --sport $p_Proxmox_original -j ACCEPT

@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# Targetas
+NicExt="ens33"
+vlan20="ens38"
+vlan60="ens37"
+
+targetes=($NicExt $vlan20 $vlan60)
+# Redes
+RedInterconexio="192.168.60.0/24"
+RedDMZ="192.168.20.0/24"
+# Puertos
+p_SSH="22"
+p_DNS="53"
+p_http="80"
+p_https="443"
+
+# VPN
+p_VPN_web_DMZ="51820"
+p_VPN_udp_traffic_DMZ="51821"
+vpn_server_DMZ="192.168.20.5"
+p_VPN_web_LAN="3333"
+p_VPN_udp_traffic_LAN="2222"
+router_LAN="192.168.20.2"
+
+#=================== BORRADO DE REGLAS ====================#
+
+# Borramos reglas por defecto
+iptables -F
+iptables -t nat -F
+iptables -X
+iptables -Z
+# Por defecto todo ACCEPT de momento
+iptables -P INPUT   ACCEPT
+iptables -P OUTPUT  ACCEPT
+iptables -P FORWARD ACCEPT
+
+#=================== NAT ====================#
+
+# Aplicamos NAT
+iptables -t nat -A POSTROUTING -s $RedDMZ          -o $NicExt -j MASQUERADE
+iptables -t nat -A POSTROUTING -s $RedInterconexio -o $NicExt -j MASQUERADE
+
+#======================= ICMP =======================#
+
+# ROUTER
+for targeta in ${targetes[@]};
+do
+    iptables -A INPUT  -i $targeta -p icmp --icmp-type echo-request -j ACCEPT
+    iptables -A OUTPUT -o $targeta -p icmp --icmp-type echo-reply   -j ACCEPT
+    iptables -A INPUT  -i $targeta -p icmp --icmp-type echo-reply   -j ACCEPT
+    iptables -A OUTPUT -o $targeta -p icmp --icmp-type echo-request -j ACCEPT
+done
+
+# VLAN40 (permito forwarding de tramas ICMP)
+# iptables -A FORWARD -d $RedAdministracio -p icmp --icmp-type echo-request -j ACCEPT
+# iptables -A FORWARD -s $RedAdministracio -p icmp --icmp-type echo-reply   -j ACCEPT
+
+#======================= DNS =======================#
+
+# # ROUTER
+iptables -A OUTPUT -o $NicExt -p udp --dport $p_DNS -j ACCEPT
+iptables -A INPUT  -i $NicExt -p udp --sport $p_DNS -j ACCEPT
+
+# VLAN40
+# iptables -A FORWARD -i $vlan40 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
+# iptables -A FORWARD -i $NicExt -o $vlan40 -p udp --sport $p_DNS -j ACCEPT
+
+#================ UPDATE/UPGRADE ====================#
+
+# ROUTER (mirar como hacer que solo se a los repos, no a otro lado)
+iptables -A OUTPUT -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
+iptables -A INPUT  -i $NicExt -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
+
+# VLAN40 (Permito el forwarding de tramas desde la VLAN40)
+# iptables -A FORWARD -i $vlan40 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
+# iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
+
+#======================= SSH =======================#
+
+iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
+iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT
+
+#=============== TRAFICO LOOPBACK ===================#
+
+# Permitir tráfico local (loopback)
+iptables -A INPUT  -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT

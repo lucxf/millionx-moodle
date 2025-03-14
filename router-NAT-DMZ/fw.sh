@@ -70,4 +70,3 @@ iptables -A FORWARD -o $NicExt -p tcp --sport $p_VPN_web_LAN -j ACCEPT
 
 # iptables -A FORWARD -i $NicExt -p tcp --dport $puerto_dnserver_original -j ACCEPT
 # iptables -A FORWARD -o $NicExt -p tcp --sport $puerto_dnserver_original -j ACCEPT
-

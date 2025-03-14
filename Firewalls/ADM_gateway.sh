@@ -64,11 +64,18 @@ iptables -t nat -A POSTROUTING -s $RedAdministracio -o $NicExt -j MASQUERADE
 
 #======================= ICMP =======================#
 
+# ROUTER
 iptables -A INPUT  -i $NicExt -p icmp --icmp-type echo-request -j ACCEPT
 iptables -A OUTPUT -o $NicExt -p icmp --icmp-type echo-reply   -j ACCEPT
 
+iptables -A INPUT  -i $NicExt -p icmp --icmp-type echo-reply -j ACCEPT
+iptables -A OUTPUT -o $NicExt -p icmp --icmp-type echo-request   -j ACCEPT
+
 iptables -A OUTPUT -o $vlan40 -p icmp --icmp-type echo-request -j ACCEPT
 iptables -A INPUT  -i $vlan40 -p icmp --icmp-type echo-reply   -j ACCEPT
+
+iptables -A INPUT  -i $vlan40 -p icmp --icmp-type echo-reply -j ACCEPT
+iptables -A OUTPUT -o $vlan40 -p icmp --icmp-type echo-request   -j ACCEPT
 
 iptables -A FORWARD -p icmp --icmp-type echo-request -j ACCEPT
 iptables -A FORWARD -p icmp --icmp-type echo-reply   -j ACCEPT

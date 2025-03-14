@@ -4,6 +4,8 @@
 vlan40="ens33"
 NicExt="ens37"
 
+targetes=($NicExt $vlan40)
+
 #Redes
 RedAdministracio="192.168.40.0/24"
 
@@ -17,14 +19,6 @@ p_VPN_udp_traffic="51821"
 
 # Maquines
 vpn_server="192.168.40.2"
-
-# MACs SSH
-mac_Lluc="F4:6D:3F:9E:05:5C"
-mac_Eric=""
-mac_Marc=""
-mac_Ania=""
-
-macs_ssh=($mac_Lluc)
 
 #=================== PROXMOX VARIABLES ====================#
 
@@ -65,20 +59,17 @@ iptables -t nat -A POSTROUTING -s $RedAdministracio -o $NicExt -j MASQUERADE
 #======================= ICMP =======================#
 
 # ROUTER
-iptables -A INPUT  -i $NicExt -p icmp --icmp-type echo-request -j ACCEPT
-iptables -A OUTPUT -o $NicExt -p icmp --icmp-type echo-reply   -j ACCEPT
+for targeta in ${targetes[@]};
+do
+    iptables -A INPUT  -i $targeta -p icmp --icmp-type echo-request -j ACCEPT
+    iptables -A OUTPUT -o $targeta -p icmp --icmp-type echo-reply   -j ACCEPT
+    iptables -A INPUT  -i $targeta -p icmp --icmp-type echo-reply   -j ACCEPT
+    iptables -A OUTPUT -o $targeta -p icmp --icmp-type echo-request -j ACCEPT
+done
 
-iptables -A INPUT  -i $NicExt -p icmp --icmp-type echo-reply -j ACCEPT
-iptables -A OUTPUT -o $NicExt -p icmp --icmp-type echo-request   -j ACCEPT
-
-iptables -A OUTPUT -o $vlan40 -p icmp --icmp-type echo-request -j ACCEPT
-iptables -A INPUT  -i $vlan40 -p icmp --icmp-type echo-reply   -j ACCEPT
-
-iptables -A INPUT  -i $vlan40 -p icmp --icmp-type echo-reply -j ACCEPT
-iptables -A OUTPUT -o $vlan40 -p icmp --icmp-type echo-request   -j ACCEPT
-
-iptables -A FORWARD -p icmp --icmp-type echo-request -j ACCEPT
-iptables -A FORWARD -p icmp --icmp-type echo-reply   -j ACCEPT
+# VLAN40 (permito forwarding de tramas ICMP)
+iptables -A FORWARD -d $RedAdministracio -p icmp --icmp-type echo-request -j ACCEPT
+iptables -A FORWARD -s $RedAdministracio -p icmp --icmp-type echo-reply   -j ACCEPT
 
 #======================= DNS =======================#
 
@@ -103,24 +94,18 @@ iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp -m multiport --sports $p_http,$
 #======================= VPN =======================#
 
 # VPN web config
-iptables -t nat -A PREROUTING  -i $NicExt     -p tcp --dport $p_VPN_web -j DNAT --to-destination $vpn_server:$p_VPN_web
+iptables -t nat -A PREROUTING  -i $NicExt -p tcp --dport $p_VPN_web -j DNAT --to-destination $vpn_server:$p_VPN_web
 
 iptables -A FORWARD -i $NicExt -o $vlan40 -d $RedAdministracio -p tcp --dport $p_VPN_web -j ACCEPT
 iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p tcp --sport $p_VPN_web -j ACCEPT
 
 # VPN traffic
-iptables -t nat -A PREROUTING -i $NicExt -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
+iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
 
 iptables -A FORWARD -i $NicExt -o $vlan40 -d $RedAdministracio -p udp --dport $p_VPN_udp_traffic -j ACCEPT
 iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p udp --sport $p_VPN_udp_traffic -j ACCEPT
 
 #======================= SSH =======================#
-
-# for mac in ${macs_ssh[@]};
-# do
-#     iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -m mac --mac-source $mac -j ACCEPT
-#     iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -m mac --mac-source $mac -j ACCEPT
-# done
 
 iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
 iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT

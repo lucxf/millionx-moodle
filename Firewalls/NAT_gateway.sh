@@ -9,6 +9,8 @@ targetes=($NicExt $vlan20 $vlan60)
 # Redes
 RedInterconexio="192.168.60.0/24"
 RedDMZ="192.168.20.0/24"
+
+redes=($RedInterconexio $RedDMZ)
 # Puertos
 p_SSH="22"
 p_DNS="53"
@@ -52,9 +54,14 @@ do
     iptables -A OUTPUT -o $targeta -p icmp --icmp-type echo-request -j ACCEPT
 done
 
-# VLAN40 (permito forwarding de tramas ICMP)
-# iptables -A FORWARD -d $RedAdministracio -p icmp --icmp-type echo-request -j ACCEPT
-# iptables -A FORWARD -s $RedAdministracio -p icmp --icmp-type echo-reply   -j ACCEPT
+# VLAN20 y VLAN3
+for red in ${redes[@]};
+do
+    iptables -A FORWARD -d $red -p icmp --icmp-type echo-request -j ACCEPT
+    iptables -A FORWARD -s $red -p icmp --icmp-type echo-reply   -j ACCEPT
+    iptables -A FORWARD -d $red -p icmp --icmp-type echo-reply   -j ACCEPT
+    iptables -A FORWARD -s $red -p icmp --icmp-type echo-request -j ACCEPT
+done
 
 #======================= DNS =======================#
 

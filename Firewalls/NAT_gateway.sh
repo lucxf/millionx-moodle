@@ -3,6 +3,7 @@
 # Targetas
 NicExt="ens33"
 vlan20="ens38"
+# 60 es la interconnexion
 vlan60="ens37"
 
 targetes=($NicExt $vlan20 $vlan60)
@@ -69,19 +70,28 @@ done
 iptables -A OUTPUT -o $NicExt -p udp --dport $p_DNS -j ACCEPT
 iptables -A INPUT  -i $NicExt -p udp --sport $p_DNS -j ACCEPT
 
-# VLAN40
-# iptables -A FORWARD -i $vlan40 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
-# iptables -A FORWARD -i $NicExt -o $vlan40 -p udp --sport $p_DNS -j ACCEPT
+# Falta habilitar al SRV DNS propio
+# VLAN20
+# iptables -A FORWARD -i $vlan20 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
+# iptables -A FORWARD -i $NicExt -o $vlan20 -p udp --sport $p_DNS -j ACCEPT
+
+# # VLAN60
+# iptables -A FORWARD -i $vlan60 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
+# iptables -A FORWARD -i $NicExt -o $vlan60 -p udp --sport $p_DNS -j ACCEPT
 
 #================ UPDATE/UPGRADE ====================#
 
 # ROUTER (mirar como hacer que solo se a los repos, no a otro lado)
 iptables -A OUTPUT -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
 iptables -A INPUT  -i $NicExt -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
+# Falta comprovar si funciona
+# # vlan20
+# iptables -A FORWARD -i $vlan20 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
+# iptables -A FORWARD -i $NicExt -o $vlan20 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
 
-# VLAN40 (Permito el forwarding de tramas desde la VLAN40)
-# iptables -A FORWARD -i $vlan40 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
-# iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
+# # vlan60
+# iptables -A FORWARD -i $vlan60 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
+# iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
 
 #======================= SSH =======================#
 

@@ -88,13 +88,13 @@ iptables -A FORWARD -i $NicExt -o $vlan60 -p udp --sport $p_DNS -j ACCEPT
 iptables -A OUTPUT -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
 iptables -A INPUT  -i $NicExt -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
 # Falta comprovar si funciona
-# # vlan20
-# iptables -A FORWARD -i $vlan20 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
-# iptables -A FORWARD -i $NicExt -o $vlan20 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
+# vlan20
+iptables -A FORWARD -i $vlan20 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan20 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
 
-# # vlan60
-# iptables -A FORWARD -i $vlan60 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
-# iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
+# vlan60
+iptables -A FORWARD -i $vlan60 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
 
 #======================= SSH =======================#
 
@@ -103,6 +103,9 @@ iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT
 
 iptables -A INPUT  -i $vlan20 -p tcp --sport $p_SSH -j ACCEPT
 iptables -A OUTPUT -o $vlan20 -p tcp --dport $p_SSH -j ACCEPT
+
+iptables -A INPUT  -i $vlan60 -p tcp --sport $p_SSH -j ACCEPT
+iptables -A OUTPUT -o $vlan60 -p tcp --dport $p_SSH -j ACCEPT
 
 #=============== TRAFICO LOOPBACK ===================#
 

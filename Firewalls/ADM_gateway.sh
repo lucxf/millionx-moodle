@@ -70,6 +70,8 @@ done
 # VLAN40 (permito forwarding de tramas ICMP)
 iptables -A FORWARD -d $RedAdministracio -p icmp --icmp-type echo-request -j ACCEPT
 iptables -A FORWARD -s $RedAdministracio -p icmp --icmp-type echo-reply   -j ACCEPT
+iptables -A FORWARD -d $RedAdministracio -p icmp --icmp-type echo-reply   -j ACCEPT
+iptables -A FORWARD -s $RedAdministracio -p icmp --icmp-type echo-request -j ACCEPT
 
 #======================= DNS =======================#
 

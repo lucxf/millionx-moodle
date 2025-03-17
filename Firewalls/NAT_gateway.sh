@@ -10,8 +10,9 @@ targetes=($NicExt $vlan20 $vlan60)
 # Redes
 RedInterconexio="192.168.60.0/24"
 RedDMZ="192.168.20.0/24"
+Red_LAN="10.0.0.0/8"
 
-redes=($RedInterconexio $RedDMZ)
+redes=($RedInterconexio $RedDMZ $RedLAN)
 # Puertos
 p_SSH="22"
 p_DNS="53"
@@ -34,15 +35,17 @@ iptables -t nat -F
 iptables -X
 iptables -Z
 # Por defecto todo ACCEPT de momento
-iptables -P INPUT   ACCEPT
-iptables -P OUTPUT  ACCEPT
-iptables -P FORWARD ACCEPT
+iptables -P INPUT   DROP
+iptables -P OUTPUT  DROP
+iptables -P FORWARD DROP
 
 #=================== NAT ====================#
 
 # Aplicamos NAT
 iptables -t nat -A POSTROUTING -s $RedDMZ          -o $NicExt -j MASQUERADE
 iptables -t nat -A POSTROUTING -s $RedInterconexio -o $NicExt -j MASQUERADE
+iptables -t nat -A POSTROUTING -d $Red_LAN         -o $vlan60 -j MASQUERADE
+iptables -t nat -A POSTROUTING -d $RedInterconexio -o $vlan60 -j MASQUERADE
 
 #======================= ICMP =======================#
 
@@ -72,12 +75,12 @@ iptables -A INPUT  -i $NicExt -p udp --sport $p_DNS -j ACCEPT
 
 # Falta habilitar al SRV DNS propio
 # VLAN20
-# iptables -A FORWARD -i $vlan20 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
-# iptables -A FORWARD -i $NicExt -o $vlan20 -p udp --sport $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan20 -p udp --sport $p_DNS -j ACCEPT
 
 # # VLAN60
-# iptables -A FORWARD -i $vlan60 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
-# iptables -A FORWARD -i $NicExt -o $vlan60 -p udp --sport $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan60 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan60 -p udp --sport $p_DNS -j ACCEPT
 
 #================ UPDATE/UPGRADE ====================#
 
@@ -97,6 +100,9 @@ iptables -A INPUT  -i $NicExt -p tcp -m multiport --sports $p_http,$p_https -j A
 
 iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
 iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT
+
+iptables -A INPUT  -i $vlan20 -p tcp --sport $p_SSH -j ACCEPT
+iptables -A OUTPUT -o $vlan20 -p tcp --dport $p_SSH -j ACCEPT
 
 #=============== TRAFICO LOOPBACK ===================#
 

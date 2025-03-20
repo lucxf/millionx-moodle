@@ -95,12 +95,6 @@ iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp -m multiport --sports $p_http,$
 
 #======================= VPN =======================#
 
-# VPN web config
-iptables -t nat -A PREROUTING  -i $NicExt -p tcp --dport $p_VPN_web -j DNAT --to-destination $vpn_server:$p_VPN_web
-
-iptables -A FORWARD -i $NicExt -o $vlan40 -d $RedAdministracio -p tcp --dport $p_VPN_web -j ACCEPT
-iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p tcp --sport $p_VPN_web -j ACCEPT
-
 # VPN traffic
 iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
 
@@ -111,6 +105,9 @@ iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p udp --sport $p
 
 iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
 iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT
+
+iptables -A INPUT  -i $vlan40 -p tcp --sport $p_SSH -j ACCEPT
+iptables -A OUTPUT -o $vlan40 -p tcp --dport $p_SSH -j ACCEPT
 
 #=============== TRAFICO LOOPBACK ===================#
 
@@ -132,3 +129,9 @@ iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp --dport $p_Proxmox_visible_1 -j
 iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp --dport $p_Proxmox_visible_2 -j ACCEPT
 iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp --dport $p_Proxmox_visible_3 -j ACCEPT
 iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp --dport $p_Proxmox_visible_4 -j ACCEPT
+
+# 8006 proxmox
+# 10000 para DNS
+# 8080
+# 700
+# SSH

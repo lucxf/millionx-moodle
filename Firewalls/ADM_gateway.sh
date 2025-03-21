@@ -8,18 +8,17 @@ targetes=($NicExt $vlan40)
 
 #Redes
 RedAdministracio="192.168.40.0/24"
+RedVpn="10.8.0.0/24"
 
 # Puertos
 p_SSH="22"
 p_http="80"
 p_https="443"
 p_DNS="53"
-p_VPN_web="51820"
 p_VPN_udp_traffic="51821"
 
 # Maquines
 vpn_server="192.168.40.2"
-RedVpn="10.8.0.0/24"
 
 #=================== PROXMOX VARIABLES ====================#
 
@@ -108,10 +107,9 @@ iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p udp --sport $p
 # 700
 # SSH
 
-#======================= SSH ADMINISTRACION VPN =======================#
-
-iptables -A FORWARD -i $NicExt -o $vlan40 -d $RedAdministracio -s $RedVpn -p tcp --dport $p_SSH -j ACCEPT
-iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -d $RedVpn -p tcp --sport $p_SSH -j ACCEPT
+# SSH
+iptables -A FORWARD -d $RedAdministracio -s $RedVpn -p tcp --dport $p_SSH -j ACCEPT
+iptables -A FORWARD -s $RedAdministracio -d $RedVpn -p tcp --sport $p_SSH -j ACCEPT
 
 #======================= SSH =======================#
 

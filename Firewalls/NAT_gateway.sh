@@ -18,14 +18,10 @@ p_SSH="22"
 p_DNS="53"
 p_http="80"
 p_https="443"
+p_VPN_udp_traffic="51821"
 
-# VPN
-p_VPN_web_DMZ="51820"
-p_VPN_udp_traffic_DMZ="51821"
-vpn_server_DMZ="192.168.20.5"
-p_VPN_web_LAN="3333"
-p_VPN_udp_traffic_LAN="2222"
-router_LAN="192.168.20.2"
+# Maquines
+vpn_server="192.168.20.12"
 
 #=================== BORRADO DE REGLAS ====================#
 
@@ -95,6 +91,14 @@ iptables -A FORWARD -i $NicExt -o $vlan20 -p tcp -m multiport --sports $p_http,$
 # vlan60
 iptables -A FORWARD -i $vlan60 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
 iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
+
+#======================= VPN =======================#
+
+# VPN traffic
+iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
+
+iptables -A FORWARD -i $NicExt -o $vlan20 -d $RedDMZ -p udp --dport $p_VPN_udp_traffic -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $NicExt -s $RedDMZ -p udp --sport $p_VPN_udp_traffic -j ACCEPT
 
 #======================= SSH =======================#
 

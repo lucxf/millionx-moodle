@@ -1,3 +1,6 @@
+Para permitir que solo la gente con VPN pueda acceder por SSH a una máquina de administración, necesitaré modificar algunas reglas en tu firewall. Aquí están los cambios necesarios:
+
+```bash
 #/bin/bash
 
 # Targetas
@@ -102,24 +105,22 @@ iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic -j D
 iptables -A FORWARD -i $NicExt -o $vlan40 -d $RedAdministracio -p udp --dport $p_VPN_udp_traffic -j ACCEPT
 iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p udp --sport $p_VPN_udp_traffic -j ACCEPT
 
-# 8006 proxmox
-# 10000 para DNS
-# 8080
-# 700
-# SSH
-
 #======================= SSH ADMINISTRACION VPN =======================#
 
+# Permitir SSH solo desde la red VPN hacia las máquinas de administración
 iptables -A FORWARD -i $NicExt -o $vlan40 -d $RedAdministracio -s $RedVpn -p tcp --dport $p_SSH -j ACCEPT
 iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -d $RedVpn -p tcp --sport $p_SSH -j ACCEPT
 
-#======================= SSH =======================#
+# IMPORTANTE: Eliminar reglas de acceso SSH directo desde el exterior (las comento)
+# iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
+# iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT
 
-iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
-iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT
-
+# Mantener SSH para la administración local desde VLAN40
 iptables -A INPUT  -i $vlan40 -p tcp --sport $p_SSH -j ACCEPT
 iptables -A OUTPUT -o $vlan40 -p tcp --dport $p_SSH -j ACCEPT
+
+# Bloquear explícitamente cualquier intento de SSH desde el exterior que no venga de la VPN
+iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp --dport $p_SSH -m state --state NEW -j DROP
 
 #=============== TRAFICO LOOPBACK ===================#
 
@@ -141,3 +142,44 @@ iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp --dport $p_Proxmox_visible_1 -j
 iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp --dport $p_Proxmox_visible_2 -j ACCEPT
 iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp --dport $p_Proxmox_visible_3 -j ACCEPT
 iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp --dport $p_Proxmox_visible_4 -j ACCEPT
+
+```
+
+## Explicación de los cambios realizados:
+
+1. **Eliminé las reglas de acceso SSH directo desde el exterior:**
+   ```bash
+   # iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
+   # iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT
+   ```
+   Estas reglas permitían acceso SSH directo al router desde cualquier dirección externa, lo cual ahora bloqueamos.
+
+2. **Agregué una regla explícita para bloquear intentos de SSH desde el exterior:**
+   ```bash
+   iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp --dport $p_SSH -m state --state NEW -j DROP
+   ```
+   Esta regla bloquea específicamente cualquier conexión SSH nueva desde el exterior hacia la red de administración.
+
+3. **Mantuve las reglas existentes de VPN que ya estaban bien configuradas:**
+   ```bash
+   iptables -A FORWARD -i $NicExt -o $vlan40 -d $RedAdministracio -s $RedVpn -p tcp --dport $p_SSH -j ACCEPT
+   iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -d $RedVpn -p tcp --sport $p_SSH -j ACCEPT
+   ```
+   Estas reglas permiten conexiones SSH solo desde la red VPN (10.8.0.0/24) hacia la red de administración.
+
+4. **Mantuve el acceso SSH local desde la VLAN40:**
+   ```bash
+   iptables -A INPUT  -i $vlan40 -p tcp --sport $p_SSH -j ACCEPT
+   iptables -A OUTPUT -o $vlan40 -p tcp --dport $p_SSH -j ACCEPT
+   ```
+   Esto permite que el tráfico SSH siga funcionando dentro de la red de administración.
+
+### Explicación del funcionamiento:
+
+Con estos cambios, solo los usuarios conectados a través de la VPN podrán iniciar conexiones SSH a las máquinas de la red de administración. El flujo funcionará así:
+
+1. El usuario primero se conecta a la VPN, obteniendo una IP dentro del rango 10.8.0.0/24
+2. Una vez conectado a la VPN, sus intentos de conexión SSH a máquinas en 192.168.40.0/24 serán permitidos
+3. Cualquier intento de conexión SSH desde fuera que no provenga de una IP de la VPN será bloqueado
+
+Estos cambios mantienen la seguridad de tu red mientras permiten un acceso controlado a través de la VPN. La mayor ventaja de este enfoque es que solo las personas que tienen credenciales de la VPN podrán intentar acceder por SSH, agregando una capa adicional de seguridad.

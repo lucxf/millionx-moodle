@@ -6,6 +6,14 @@ vlan60="ens33"
 RedInterconexio="192.168.60.0/24"
 RedLAN="10.0.0.0/8"
 
+vpn_server="10.3.0.2"
+
+p_SSH="22"
+p_http="80"
+p_https="443"
+p_DNS="53"
+p_VPN_udp_traffic="51821"
+
 #=================== BORRADO DE REGLAS ====================#
 
 # Borramos reglas por defecto
@@ -59,17 +67,11 @@ iptables -A FORWARD -i $vlan60 -o $vlan3 -p tcp -m multiport --sports $p_http,$p
 
 #======================= VPN =======================#
 
-# VPN web config
-iptables -t nat -A PREROUTING  -i $vlan60 -p tcp --dport $p_VPN_web -j DNAT --to-destination $vpn_server:$p_VPN_web
-
-iptables -A FORWARD -i $vlan60 -o $vlan3 -d $RedAdministracio -p tcp --dport $p_VPN_web -j ACCEPT
-iptables -A FORWARD -i $vlan3 -o $vlan60 -s $RedAdministracio -p tcp --sport $p_VPN_web -j ACCEPT
-
 # VPN traffic
 iptables -t nat -A PREROUTING  -i $vlan60 -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
 
-iptables -A FORWARD -i $vlan60 -o $vlan3 -d $RedAdministracio -p udp --dport $p_VPN_udp_traffic -j ACCEPT
-iptables -A FORWARD -i $vlan3 -o $vlan60 -s $RedAdministracio -p udp --sport $p_VPN_udp_traffic -j ACCEPT
+iptables -A FORWARD -i $vlan60 -o $vlan3 -d $RedLAN -p udp --dport $p_VPN_udp_traffic -j ACCEPT
+iptables -A FORWARD -i $vlan3 -o $vlan60 -s $RedLAN -p udp --sport $p_VPN_udp_traffic -j ACCEPT
 
 #======================= SSH =======================#
 

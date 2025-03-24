@@ -18,11 +18,11 @@ p_SSH="22"
 p_DNS="53"
 p_http="80"
 p_https="443"
-p_VPN_udp_traffic="51820"
-
+p_VPN_udp_traffic_DMZ="51820"
+p_VPN_udp_traffic_LAN="51821"
 # Maquines
-vpn_server="192.168.20.12"
-
+vpn_server_DMZ="192.168.20.12"
+router_LAN="192.168.60.2"
 #=================== BORRADO DE REGLAS ====================#
 
 # Borramos reglas por defecto
@@ -94,11 +94,17 @@ iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_http,$
 
 #======================= VPN =======================#
 
-# VPN traffic
-iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
+# VPN traffic DMZ
+iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic_DMZ -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic_DMZ
 
-iptables -A FORWARD -i $NicExt -o $vlan20 -d $RedDMZ -p udp --dport $p_VPN_udp_traffic -j ACCEPT
-iptables -A FORWARD -i $vlan20 -o $NicExt -s $RedDMZ -p udp --sport $p_VPN_udp_traffic -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan20 -d $RedDMZ -p udp --dport $p_VPN_udp_traffic_DMZ -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $NicExt -s $RedDMZ -p udp --sport $p_VPN_udp_traffic_DMZ -j ACCEPT
+
+# VPN traffic LAN
+iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic_LAN -j DNAT --to-destination $router_LAN:51820
+
+iptables -A FORWARD -i $NicExt -o $vlan60 -d $RedDMZ -p udp --dport $p_VPN_udp_traffic_LAN -j ACCEPT
+iptables -A FORWARD -i $vlan60 -o $NicExt -s $RedDMZ -p udp --sport $p_VPN_udp_traffic_LAN -j ACCEPT
 
 #======================= SSH =======================#
 

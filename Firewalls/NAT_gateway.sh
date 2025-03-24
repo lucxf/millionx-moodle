@@ -95,7 +95,7 @@ iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_http,$
 #======================= VPN =======================#
 
 # VPN traffic DMZ
-iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic_DMZ -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic_DMZ
+iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic_DMZ -j DNAT --to-destination $vpn_server_DMZ:$p_VPN_udp_traffic_DMZ
 
 iptables -A FORWARD -i $NicExt -o $vlan20 -d $RedDMZ -p udp --dport $p_VPN_udp_traffic_DMZ -j ACCEPT
 iptables -A FORWARD -i $vlan20 -o $NicExt -s $RedDMZ -p udp --sport $p_VPN_udp_traffic_DMZ -j ACCEPT

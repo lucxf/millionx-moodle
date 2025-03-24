@@ -47,11 +47,11 @@ iptables -A FORWARD -p icmp --icmp-type echo-reply   -j ACCEPT
 
 #======================= DNS =======================#
 
-# # ROUTER
+# ROUTER
 iptables -A OUTPUT -o $vlan60 -p udp --dport $p_DNS -j ACCEPT
 iptables -A INPUT  -i $vlan60 -p udp --sport $p_DNS -j ACCEPT
 
-# # vlan3
+# vlan3
 iptables -A FORWARD -i $vlan3  -o $vlan60 -p udp --dport $p_DNS -j ACCEPT
 iptables -A FORWARD -i $vlan60 -o $vlan3  -p udp --sport $p_DNS -j ACCEPT
 

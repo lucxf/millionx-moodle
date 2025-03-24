@@ -15,7 +15,7 @@ p_SSH="22"
 p_http="80"
 p_https="443"
 p_DNS="53"
-p_VPN_udp_traffic="51821"
+p_VPN_udp_traffic="51820"
 
 # Maquines
 vpn_server="192.168.40.2"

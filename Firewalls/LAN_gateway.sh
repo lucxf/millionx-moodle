@@ -3,6 +3,8 @@
 vlan3="ens37"
 vlan60="ens33"
 
+targetes=($vlan3 $vlan60)
+
 RedInterconexio="192.168.60.0/24"
 RedLAN="10.0.0.0/8"
 

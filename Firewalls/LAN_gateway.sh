@@ -6,7 +6,7 @@ vlan60="ens33"
 RedInterconexio="192.168.60.0/24"
 RedLAN="10.0.0.0/8"
 
-vpn_server="10.3.0.2"
+vpn_server="10.3.0.3"
 
 p_SSH="22"
 p_http="80"
@@ -52,8 +52,8 @@ iptables -A OUTPUT -o $vlan60 -p udp --dport $p_DNS -j ACCEPT
 iptables -A INPUT  -i $vlan60 -p udp --sport $p_DNS -j ACCEPT
 
 # # vlan3
-iptables -A FORWARD -i $vlan3 -o $vlan60 -p udp --dport $p_DNS -j ACCEPT
-iptables -A FORWARD -i $vlan60 -o $vlan3 -p udp --sport $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan3  -o $vlan60 -p udp --dport $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan60 -o $vlan3  -p udp --sport $p_DNS -j ACCEPT
 
 #================ UPDATE/UPGRADE ====================#
 
@@ -70,13 +70,16 @@ iptables -A FORWARD -i $vlan60 -o $vlan3 -p tcp -m multiport --sports $p_http,$p
 # VPN traffic
 iptables -t nat -A PREROUTING  -i $vlan60 -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
 
-iptables -A FORWARD -i $vlan60 -o $vlan3 -d $RedLAN -p udp --dport $p_VPN_udp_traffic -j ACCEPT
-iptables -A FORWARD -i $vlan3 -o $vlan60 -s $RedLAN -p udp --sport $p_VPN_udp_traffic -j ACCEPT
+iptables -A FORWARD -i $vlan60 -o $vlan3  -d $RedLAN -p udp --dport $p_VPN_udp_traffic -j ACCEPT
+iptables -A FORWARD -i $vlan3  -o $vlan60 -s $RedLAN -p udp --sport $p_VPN_udp_traffic -j ACCEPT
 
 #======================= SSH =======================#
 
 iptables -A INPUT  -i $vlan60 -p tcp --dport $p_SSH -j ACCEPT
 iptables -A OUTPUT -o $vlan60 -p tcp --sport $p_SSH -j ACCEPT
+
+iptables -A OUTPUT -o $vlan3 -p tcp --dport $p_SSH -j ACCEPT
+iptables -A INPUT  -i $vlan3 -p tcp --sport $p_SSH -j ACCEPT
 
 #=============== TRAFICO LOOPBACK ===================#
 

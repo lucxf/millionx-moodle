@@ -70,6 +70,10 @@ iptables -A FORWARD -i $vlan60 -o $vlan3 -p tcp -m multiport --sports $p_http,$p
 #======================= VPN =======================#
 
 # VPN traffic
+
+iptables -A OUTPUT -o $vlan60 -p udp -m multiport --dports $p_VPN_udp_traffic -j ACCEPT
+iptables -A INPUT  -i $vlan60 -p udp -m multiport --sports $p_VPN_udp_traffic -j ACCEPT
+
 iptables -t nat -A PREROUTING  -i $vlan60 -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
 
 iptables -A FORWARD -i $vlan60 -o $vlan3  -d $RedLAN -p udp --dport $p_VPN_udp_traffic -j ACCEPT

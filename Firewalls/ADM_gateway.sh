@@ -107,10 +107,6 @@ iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p udp --sport $p
 # 700
 # SSH
 
-# SSH
-iptables -A FORWARD -d $RedAdministracio -s $RedVpn -p tcp --dport $p_SSH -j ACCEPT
-iptables -A FORWARD -s $RedAdministracio -d $RedVpn -p tcp --sport $p_SSH -j ACCEPT
-
 #======================= SSH =======================#
 
 iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT

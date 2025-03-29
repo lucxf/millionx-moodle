@@ -10,7 +10,7 @@ targetes=($NicExt $vlan20 $vlan60)
 # Redes
 RedInterconexio="192.168.60.0/24"
 RedDMZ="192.168.20.0/24"
-Red_LAN="10.0.0.0/8"
+RedLAN="10.0.0.0/8"
 
 redes=($RedInterconexio $RedDMZ $RedLAN)
 # Puertos
@@ -20,6 +20,7 @@ p_http="80"
 p_https="443"
 p_VPN_udp_traffic_DMZ="51820"
 p_VPN_udp_traffic_LAN="51821"
+p_VPN_udp_traffic_LAN_router_LAN="51820"
 # Maquines
 vpn_server_DMZ="192.168.20.12"
 router_LAN="192.168.60.2"
@@ -40,7 +41,7 @@ iptables -P FORWARD DROP
 # Aplicamos NAT
 iptables -t nat -A POSTROUTING -s $RedDMZ          -o $NicExt -j MASQUERADE
 iptables -t nat -A POSTROUTING -s $RedInterconexio -o $NicExt -j MASQUERADE
-iptables -t nat -A POSTROUTING -d $Red_LAN         -o $vlan60 -j MASQUERADE
+iptables -t nat -A POSTROUTING -d $RedLAN          -o $vlan60 -j MASQUERADE
 iptables -t nat -A POSTROUTING -d $RedInterconexio -o $vlan60 -j MASQUERADE
 
 #======================= ICMP =======================#
@@ -101,10 +102,10 @@ iptables -A FORWARD -i $NicExt -o $vlan20 -d $RedDMZ -p udp --dport $p_VPN_udp_t
 iptables -A FORWARD -i $vlan20 -o $NicExt -s $RedDMZ -p udp --sport $p_VPN_udp_traffic_DMZ -j ACCEPT
 
 # VPN traffic LAN
-iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic_LAN -j DNAT --to-destination $router_LAN:51820
+iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic_LAN -j DNAT --to-destination $router_LAN:$p_VPN_udp_traffic_LAN_router_LAN
 
-iptables -A FORWARD -i $NicExt -o $vlan60 -d $RedDMZ -p udp --dport $p_VPN_udp_traffic_LAN -j ACCEPT
-iptables -A FORWARD -i $vlan60 -o $NicExt -s $RedDMZ -p udp --sport $p_VPN_udp_traffic_LAN -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan60 -d $RedLAN -p udp --dport $p_VPN_udp_traffic_LAN -j ACCEPT
+iptables -A FORWARD -i $vlan60 -o $NicExt -s $RedLAN -p udp --sport $p_VPN_udp_traffic_LAN -j ACCEPT
 
 #======================= SSH =======================#
 

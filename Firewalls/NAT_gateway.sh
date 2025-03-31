@@ -24,6 +24,7 @@ p_VPN_udp_traffic_LAN_router_LAN="51820"
 # Maquines
 vpn_server_DMZ="192.168.20.12"
 router_LAN="192.168.60.2"
+dns_server="192.168.20.5"
 #=================== BORRADO DE REGLAS ====================#
 
 # Borramos reglas por defecto
@@ -67,17 +68,20 @@ done
 #======================= DNS =======================#
 
 # # ROUTER
-iptables -A OUTPUT -o $NicExt -p udp --dport $p_DNS -j ACCEPT
-iptables -A INPUT  -i $NicExt -p udp --sport $p_DNS -j ACCEPT
 
-# Falta habilitar al SRV DNS propio
-# VLAN20
-iptables -A FORWARD -i $vlan20 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
-iptables -A FORWARD -i $NicExt -o $vlan20 -p udp --sport $p_DNS -j ACCEPT
+for targeta in ${targetes[@]};
+do
+    iptables -A OUTPUT -o $targeta -p udp --dport $p_DNS -j ACCEPT
+    iptables -A INPUT  -i $targeta -p udp --sport $p_DNS -j ACCEPT
+done
 
-# # VLAN60
-iptables -A FORWARD -i $vlan60 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
-iptables -A FORWARD -i $NicExt -o $vlan60 -p udp --sport $p_DNS -j ACCEPT
+# Permitimos el forwarding del puerto DNS
+iptables -A FORWARD -p udp --dport $p_DNS -j ACCEPT
+iptables -A FORWARD -p udp --sport $p_DNS -j ACCEPT
+
+# Redirigir trafico a servidor DNS
+
+iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
 
 #================ UPDATE/UPGRADE ====================#
 

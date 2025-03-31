@@ -5,6 +5,7 @@ LOGFILE="/var/log/Project/installation.log"
 DOMAIN="millionx-academy.com"
 NS1=172.31.9.254
 NS2=172.31.9.255
+# LA ip es la del router publica, porque es donde està el reverse proxy, si el reverse proxy estubiera en otro aldo seria aputnado al Reverse Proxy
 DNS_RESOLV_IP=172.30.10.13
 USER="lucxf"
 BIND_FOLDER_PATH="/etc/bind/"

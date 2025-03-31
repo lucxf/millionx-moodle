@@ -58,6 +58,7 @@ log_info "Creando la zona de DNS..."
 chmod +x ./bindDNS.sh
 if ! sudo ./bindDNS.sh $DOMAIN $NS1 $NS2 $DNS_RESOLV_IP $USER; then
     rm -r $BIND_FOLDER_PATH
+    rm -r /var/cache/bind/
     apt purge bind9 bind9utils bind9-doc -y
     log_error "Error al crear la zona de DNS."
 fi

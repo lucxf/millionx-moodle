@@ -61,8 +61,9 @@ $DOMAIN. IN A $IP
 ns1.$DOMAIN. IN A $NS1
 ns2.$DOMAIN. IN A $NS2
 www.$DOMAIN. IN A $IP
-kuma.$DOMAIN. IN A $IP
-traefik.$DOMAIN. IN A $IP
+moodle.$DOMAIN. IN A $IP
+zabbix.$DOMAIN. IN A $IP
+graphana.$DOMAIN. IN A $IP
 nextcloud.$DOMAIN. IN A $IP
 EOF
 

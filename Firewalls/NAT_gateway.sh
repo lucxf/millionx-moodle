@@ -75,13 +75,14 @@ do
     iptables -A INPUT  -i $targeta -p udp --sport $p_DNS -j ACCEPT
 done
 
+# FALTA RESTINGIR MEJOR UNA A UNA NO PERMITIR TODO
 # Permitimos el forwarding del puerto DNS
-iptables -A FORWARD -p udp --dport $p_DNS -j ACCEPT
+iptables -A FORWARD -p udp --dport $p_DNS -j ACCEPT # HAY QEU PONERLE SERVIDOR DESTINO, PARA QEU NO VAYA A TODOS LADOS
 iptables -A FORWARD -p udp --sport $p_DNS -j ACCEPT
 
 # Redirigir trafico a servidor DNS
 
-iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
+iptables -t nat -A PREROUTING -i $NicExt -p udp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
 
 #================ UPDATE/UPGRADE ====================#
 
@@ -102,14 +103,14 @@ iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_http,$
 # VPN traffic DMZ
 iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic_DMZ -j DNAT --to-destination $vpn_server_DMZ:$p_VPN_udp_traffic_DMZ
 
-iptables -A FORWARD -i $NicExt -o $vlan20 -d $RedDMZ -p udp --dport $p_VPN_udp_traffic_DMZ -j ACCEPT
-iptables -A FORWARD -i $vlan20 -o $NicExt -s $RedDMZ -p udp --sport $p_VPN_udp_traffic_DMZ -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan20 -d $vpn_server_DMZ -p udp --dport $p_VPN_udp_traffic_DMZ -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $NicExt -s $vpn_server_DMZ -p udp --sport $p_VPN_udp_traffic_DMZ -j ACCEPT
 
 # VPN traffic LAN
-iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic_LAN -j DNAT --to-destination $router_LAN:$p_VPN_udp_traffic_LAN_router_LAN
+iptables -t nat -A PREROUTING -p udp --dport $p_VPN_udp_traffic_LAN -j DNAT --to-destination $router_LAN:$p_VPN_udp_traffic_LAN_router_LAN
 
-iptables -A FORWARD -i $NicExt -o $vlan60 -d $RedLAN -p udp --dport $p_VPN_udp_traffic_LAN -j ACCEPT
-iptables -A FORWARD -i $vlan60 -o $NicExt -s $RedLAN -p udp --sport $p_VPN_udp_traffic_LAN -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan60 -p udp -d $router_LAN --dport $p_VPN_udp_traffic_LAN_router_LAN -j ACCEPT
+iptables -A FORWARD -i $vlan60 -o $NicExt -p udp -s $router_LAN --sport $p_VPN_udp_traffic_LAN_router_LAN -j ACCEPT
 
 #======================= SSH =======================#
 

@@ -8,7 +8,7 @@ targetes=($vlan3 $vlan60)
 RedInterconexio="192.168.60.0/24"
 RedLAN="10.0.0.0/8"
 
-vpn_server="10.3.0.3"
+vpn_server="10.3.0.2"
 
 p_SSH="22"
 p_http="80"
@@ -69,22 +69,11 @@ iptables -A FORWARD -i $vlan60 -o $vlan3 -p tcp -m multiport --sports $p_http,$p
 
 #======================= VPN =======================#
 
-# VPN traffic
+# VPN traffic LAN
+iptables -t nat -A PREROUTING -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
 
-# iptables -A OUTPUT -o $vlan60 -p udp -m multiport --dports $p_VPN_udp_traffic -j ACCEPT
-# iptables -A INPUT  -i $vlan60 -p udp -m multiport --sports $p_VPN_udp_traffic -j ACCEPT
-
-# iptables -t nat -A PREROUTING  -i $vlan60 -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
-
-# iptables -A FORWARD -i $vlan60 -o $vlan3  -d $RedLAN -p udp --dport $p_VPN_udp_traffic -j ACCEPT
-# iptables -A FORWARD -i $vlan3  -o $vlan60 -s $RedLAN -p udp --sport $p_VPN_udp_traffic -j ACCEPT
-
-# Redirigir el puerto 51820 recibido al servidor WG
-iptables -t nat -A PREROUTING -p udp --dport 51820 -j DNAT --to-destination 10.3.0.2:51820
-
-# Permitir el forwarding hacia el servidor y desde el servidor
-iptables -A FORWARD -p udp -d 10.3.0.2 --dport 51820 -j ACCEPT
-iptables -A FORWARD -p udp -s 10.3.0.2 --sport 51820 -j ACCEPT
+iptables -A FORWARD -i $vlan60 -o $vlan3  -p udp -d $vpn_server --dport $p_VPN_udp_traffic -j ACCEPT
+iptables -A FORWARD -i $vlan3  -o $vlan60 -p udp -s $vpn_server --sport $p_VPN_udp_traffic -j ACCEPT
 
 #======================= SSH =======================#
 

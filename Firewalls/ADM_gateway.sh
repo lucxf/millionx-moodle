@@ -98,8 +98,8 @@ iptables -A FORWARD -i $NicExt -o $vlan40 -p tcp -m multiport --sports $p_http,$
 # VPN traffic
 iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
 
-iptables -A FORWARD -i $NicExt -o $vlan40 -d $RedAdministracio -p udp --dport $p_VPN_udp_traffic -j ACCEPT
-iptables -A FORWARD -i $vlan40 -o $NicExt -s $RedAdministracio -p udp --sport $p_VPN_udp_traffic -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan40 -d $vpn_server -p udp --dport $p_VPN_udp_traffic -j ACCEPT
+iptables -A FORWARD -i $vlan40 -o $NicExt -s $vpn_server -p udp --sport $p_VPN_udp_traffic -j ACCEPT
 
 #======================= SSH =======================#
 

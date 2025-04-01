@@ -6,8 +6,9 @@ LOGFILE="/var/log/Project/bind_installation.log"
 DOMAIN=$1
 NS1=$2
 NS2=$3
-IP=$4
-USER=$5
+NS3=$4
+IP=$5
+USER=$6
 ZONE_FILE="/etc/bind/$DOMAIN"
 
 # Función para escribir errores en el log y mostrar el mensaje en rojo
@@ -56,10 +57,12 @@ $DOMAIN. IN SOA ns1.$DOMAIN. $USER.$DOMAIN. (
 ; Servidores DNS
 $DOMAIN. IN NS ns1.$DOMAIN.
 $DOMAIN. IN NS ns2.$DOMAIN.
+$DOMAIN. IN NS ns3.$DOMAIN.
 $DOMAIN. IN A $IP
 ; Direcciones IP
 ns1.$DOMAIN. IN A $NS1
 ns2.$DOMAIN. IN A $NS2
+ns3.$DOMAIN. IN A $NS3
 www.$DOMAIN. IN A $IP
 moodle.$DOMAIN. IN A $IP
 zabbix.$DOMAIN. IN A $IP

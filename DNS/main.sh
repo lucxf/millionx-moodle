@@ -3,8 +3,9 @@
 # Definir archivo de log
 LOGFILE="/var/log/Project/installation.log"
 DOMAIN="millionx-academy.com"
-NS1=172.31.9.254
-NS2=172.31.9.255
+NS1=192.168.20.5
+NS2=172.31.9.254
+NS3=172.31.9.255
 # LA ip es la del router publica, porque es donde està el reverse proxy, si el reverse proxy estubiera en otro aldo seria aputnado al Reverse Proxy
 DNS_RESOLV_IP=172.30.10.13
 USER="lucxf"
@@ -57,7 +58,7 @@ fi
 # Creamos la zona de DNS
 log_info "Creando la zona de DNS..."
 chmod +x ./bindDNS.sh
-if ! sudo ./bindDNS.sh $DOMAIN $NS1 $NS2 $DNS_RESOLV_IP $USER; then
+if ! sudo ./bindDNS.sh $DOMAIN $NS1 $NS2 $NS3 $DNS_RESOLV_IP $USER; then
     rm -r $BIND_FOLDER_PATH
     rm -r /var/cache/bind/
     apt purge bind9 bind9utils bind9-doc -y

@@ -3,11 +3,12 @@
 # Definir archivo de log
 LOGFILE="/var/log/Project/installation.log"
 DOMAIN="millionx-academy.com"
-NS1=192.168.20.5
-NS2=172.31.9.254
-NS3=172.31.9.255
 # LA ip es la del router publica, porque es donde està el reverse proxy, si el reverse proxy estubiera en otro aldo seria aputnado al Reverse Proxy
 DNS_RESOLV_IP=172.30.10.13
+# Como principal ponemos el que se ve des del exterior
+NS1=$DNS_RESOLV_IP
+NS2=172.31.9.254
+NS3=172.31.9.255
 USER="lucxf"
 BIND_FOLDER_PATH="/etc/bind/"
 

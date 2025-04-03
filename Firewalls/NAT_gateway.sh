@@ -66,23 +66,15 @@ do
 done
 
 #======================= DNS =======================#
+# Router
+# Forwarding
+iptables -t nat -A PREROUTING  -i $NicExt -d $dns_server -p udp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
 
-# # ROUTER
+# Permito la salida i entrada de tramas DNS
+iptables -A OUTPUT -o $NicExt -p udp --dport $p_DNS -j ACCEPT
+iptables -A INPUT  -i $NicExt -p udp --sport $p_DNS -j ACCEPT
 
-for targeta in ${targetes[@]};
-do
-    iptables -A OUTPUT -o $targeta -p udp --dport $p_DNS -j ACCEPT
-    iptables -A INPUT  -i $targeta -p udp --sport $p_DNS -j ACCEPT
-done
-
-# FALTA RESTINGIR MEJOR UNA A UNA NO PERMITIR TODO
-# Permitimos el forwarding del puerto DNS
-iptables -A FORWARD -p udp --dport $p_DNS -j ACCEPT # HAY QEU PONERLE SERVIDOR DESTINO, PARA QEU NO VAYA A TODOS LADOS
-iptables -A FORWARD -p udp --sport $p_DNS -j ACCEPT
-
-# Redirigir trafico a servidor DNS
-
-iptables -t nat -A PREROUTING -i $NicExt -p udp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
+# FORWARDING vlan20
 
 #================ UPDATE/UPGRADE ====================#
 

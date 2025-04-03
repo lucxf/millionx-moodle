@@ -13,3 +13,5 @@ apt install nginx -y
 2. Configurar fichero **sites-enabled**
 
 ![alt text](image-2.png)
+
+[yt video](https://www.youtube.com/watch?v=DyXl4c2XN-o)

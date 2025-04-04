@@ -22,7 +22,7 @@ p_VPN_udp_traffic_DMZ="51820"
 p_VPN_udp_traffic_LAN="51821"
 p_VPN_udp_traffic_LAN_router_LAN="51820"
 # Maquines
-vpn_server_DMZ="192.168.20.12"
+vpn_server_DMZ="192.168.20.2"
 router_LAN="192.168.60.2"
 dns_server="192.168.20.5"
 #=================== BORRADO DE REGLAS ====================#

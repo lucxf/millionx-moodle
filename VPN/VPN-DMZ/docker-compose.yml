@@ -16,7 +16,7 @@ services:
       - PEERS=4
       - PEERDNS=auto
       - INTERNAL_SUBNET=10.8.0.0
-      - ALLOWEDIPS=192.168.40.0/24
+      - ALLOWEDIPS=192.168.20.0/24
     volumes:
       - /volums/docker-wireguard-vpn-dmz/config:/config
       - /lib/modules:/lib/modules

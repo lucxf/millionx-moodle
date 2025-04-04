@@ -16,7 +16,7 @@ services:
       - PEERS=4
       - PEERDNS=auto
       - INTERNAL_SUBNET=10.8.0.0
-      - ALLOWEDIPS=192.168.40.0/24
+      - ALLOWEDIPS=10.0.0.0/8
     volumes:
       - /volums/docker-wireguard-vpn-lan/config:/config
       - /lib/modules:/lib/modules

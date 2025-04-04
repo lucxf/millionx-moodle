@@ -1,0 +1,5 @@
+services:
+
+  zabbix_server:
+    container_name: zabbix_server
+    image: 

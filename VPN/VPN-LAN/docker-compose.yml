@@ -11,7 +11,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/London
-      - SERVERURL=172.30.10.21
+      - SERVERURL=172.30.10.13
       - SERVERPORT=51820
       - PEERS=4
       - PEERDNS=auto

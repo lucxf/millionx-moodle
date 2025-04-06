@@ -51,36 +51,15 @@ sudo ln -s /etc/nginx/sites-available/millionx-academy.com.conf /etc/nginx/sites
 
 Una vez reiniciado nginx, nos daremos cuenta de que si accedemos tendremos problemas debido a que nos dice que no es de confianza, para ello tendremos que configurar mas cosas.
 
-**Solucion de ChatGpt**
+Tendremos que ir a nuestro nextcloud y editar el fichero `config.php` donde agregaremos dentro como tursted `nextcloud.millionx-academy.com`
 
-Solución
+![alt text](image-3.png)
 
-Debes agregar tu dominio (nextcloud.millionx-academy.com en este caso) a la lista de dominios confiables de Nextcloud. Para hacerlo, debes editar el archivo config.php en el directorio de configuración de Nextcloud.
+![alt text](image-4.png)
 
-    Ubicación del archivo config.php: El archivo config.php de Nextcloud generalmente se encuentra en la siguiente ruta dentro de tu instalación de Nextcloud:
+![alt text](image-5.png)
 
-/var/www/nextcloud/config/config.php
+Como podemos comprobar ya funciona correctametne, solo faltará el **TLS**
 
-Nota: El directorio puede variar según tu configuración, pero generalmente está en la carpeta de instalación de Nextcloud.
+![alt text](image-6.png)
 
-Editar `config.php`: Abre el archivo config.php con un editor de texto, por ejemplo, nano:
-
-`sudo nano /var/www/nextcloud/config/config.php`
-
-Agregar el dominio confiable: Dentro de este archivo, busca el parámetro 'trusted_domains'. Si no está presente, deberás agregarlo. Debes agregar el dominio o subdominio que estás utilizando (en este caso, nextcloud.millionx-academy.com).
-
-El bloque que debes agregar o modificar se verá así:
-```php
-'trusted_domains' =>
-array (
-  0 => 'localhost',
-  1 => 'nextcloud.millionx-academy.com',  // Agrega tu dominio aquí
-),
-```
-Si ya hay otros dominios en esta lista, simplemente agrega el nuevo dominio como una nueva línea numerada (en este caso, 1 => 'nextcloud.millionx-academy.com').
-
-Guardar y cerrar: Una vez que hayas agregado el dominio, guarda el archivo y cierra el editor (Ctrl + O para guardar y Ctrl + X para salir en nano).
-
-Reiniciar el servidor web: Después de modificar el archivo de configuración, es recomendable reiniciar el servidor web para asegurarte de que los cambios tomen efecto. Si estás usando Nginx, ejecuta:
-
-`sudo systemctl reload nginx`

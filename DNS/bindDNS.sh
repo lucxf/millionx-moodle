@@ -66,8 +66,9 @@ ns3.$DOMAIN. IN A $NS3
 www.$DOMAIN. IN A $IP
 moodle.$DOMAIN. IN A $IP
 zabbix.$DOMAIN. IN A $IP
-graphana.$DOMAIN. IN A $IP
+grafana.$DOMAIN. IN A $IP
 nextcloud.$DOMAIN. IN A $IP
+webmin-dns.$DOMAIN. IN A $IP
 EOF
 
 if [ $? -ne 0 ]; then

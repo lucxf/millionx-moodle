@@ -63,3 +63,18 @@ Como podemos comprobar ya funciona correctametne, solo faltará el **TLS**
 
 ![alt text](image-6.png)
 
+# TLS
+
+Para obtener ceritificado tls:
+
+```bash
+apt install certbot python3-certbot-nginx -y
+```
+
+Para crear los certificados hazemos lo siguiente:
+
+```bash
+certbot --nginx -d nextcloud.millionx-academy.com -d www.nextcloud.millionx-academy.com
+```
+
+--register-unsafely-without-email

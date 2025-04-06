@@ -68,7 +68,8 @@ done
 #======================= DNS =======================#
 # Router
 # Forwarding
-iptables -t nat -A PREROUTING  -i $NicExt -d $dns_server -p udp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
+iptables -t nat -A PREROUTING -p udp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
+iptables -t nat -A PREROUTING -p tcp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
 
 # Permito la salida i entrada de tramas DNS
 iptables -A OUTPUT -o $NicExt -p udp --dport $p_DNS -j ACCEPT

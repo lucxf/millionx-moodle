@@ -68,14 +68,26 @@ done
 #======================= DNS =======================#
 # Router
 # Forwarding
-iptables -t nat -A PREROUTING -p udp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
-iptables -t nat -A PREROUTING -p tcp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
+iptables -t nat -i $NicExt -A PREROUTING -p udp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
+iptables -t nat -i $NicExt -A PREROUTING -p tcp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
 
 # Permito la salida i entrada de tramas DNS
 iptables -A OUTPUT -o $NicExt -p udp --dport $p_DNS -j ACCEPT
 iptables -A INPUT  -i $NicExt -p udp --sport $p_DNS -j ACCEPT
 
-# FORWARDING vlan20
+# Vlan20
+
+iptables -A FORWARD -i $vlan60 -o $NicExt -p tcp -m multiport --dports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan60 -o $NicExt -p udp -m multiport --dports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan60 -p udp -m multiport --sports $p_DNS -j ACCEPT
+
+# Vlan60
+
+iptables -A FORWARD -i $vlan20 -o $NicExt -p tcp -m multiport --dports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $NicExt -p udp -m multiport --dports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan60 -p udp -m multiport --sports $p_DNS -j ACCEPT
 
 #================ UPDATE/UPGRADE ====================#
 

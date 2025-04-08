@@ -65,16 +65,59 @@ Como podemos comprobar ya funciona correctametne, solo faltará el **TLS**
 
 # TLS
 
-Para obtener ceritificado tls:
+1. Crear directorio donde guardar los certificados
 
 ```bash
-apt install certbot python3-certbot-nginx -y
+mkdir -p /etc/nginx/ssl
+chmod 700 /etc/nginx/ssl
 ```
 
-Para crear los certificados hazemos lo siguiente:
+2. Crear clave privada del certificado
 
 ```bash
-certbot --nginx -d nextcloud.millionx-academy.com -d www.nextcloud.millionx-academy.com
+openssl -algorithm RSA -out /etc/nginx/ssl/clave_privada.key
 ```
 
---register-unsafely-without-email
+3. Crear una solicitud para certificado ssl
+
+pones tus datos, email puede ser falso
+
+```bash
+openssl req -new -key /etc/nginx/ssl/clave_privada.key -out /etc/nginx/ssl/solicitud.csr
+```
+
+4. Creo el certificado usando la solicitud
+
+```bash
+openssl x509 -req -days 365 -in /etc/nginx/ssl/solicitud.csr -signkey /etc/nginx/ssl/clave_privada.key -out /etc/nginx/ssl/certificado.crt
+```
+
+```bash
+server {
+  #Listen in the harbor 80, ipv4.
+  listen 80; 
+}
+
+server{
+
+  listen 442;
+  #Here you must enter the name of your domain.
+  server_name millionx-academy.com;
+  
+  ssl_certificate /etc/nginx/ssl/certificado.crt;
+  ssl_certificate_ley /etc/nginx/ssl/clave_privada.key
+
+  access_log            /var/log/nginx/millionx-academy.com.access.log;
+
+  location / {
+      #The proxy settings.
+      proxy_pass http://192.168.20.12:700/;
+  }
+}
+```
+
+5. RELOAD
+
+```bash
+nginx -s reload
+```

@@ -10,9 +10,9 @@
 apt install nginx -y
 ```
 
-![alt text](image.png)
+![alt text](./.images/image.png)
 
-![alt text](image-1.png)
+![alt text](./.images/image-1.png)
 
 2. Configurar el **sites-available**
 
@@ -53,15 +53,15 @@ Una vez reiniciado nginx, nos daremos cuenta de que si accedemos tendremos probl
 
 Tendremos que ir a nuestro nextcloud y editar el fichero `config.php` donde agregaremos dentro como tursted `nextcloud.millionx-academy.com`
 
-![alt text](image-3.png)
+![alt text](./.images/image-3.png)
 
-![alt text](image-4.png)
+![alt text](./.images/image-4.png)
 
-![alt text](image-5.png)
+![alt text](./.images/image-5.png)
 
 Como podemos comprobar ya funciona correctametne, solo faltará el **TLS**
 
-![alt text](image-6.png)
+![alt text](./.images/image-6.png)
 
 # TLS
 
@@ -72,11 +72,17 @@ mkdir -p /etc/nginx/ssl
 chmod 700 /etc/nginx/ssl
 ```
 
+![alt text](./.images/capt1)
+
+![alt text](./.images/capt2)
+
 2. Crear clave privada del certificado
 
 ```bash
 openssl genpkey -algorithm RSA -out /etc/nginx/ssl/clave_privada.key
 ```
+
+![alt text](./.images/capt3)
 
 3. Crear una solicitud para certificado ssl
 
@@ -86,33 +92,49 @@ pones tus datos, email puede ser falso
 openssl req -new -key /etc/nginx/ssl/clave_privada.key -out /etc/nginx/ssl/solicitud.csr
 ```
 
+![alt text](./.images/capt4)
+
 4. Creo el certificado usando la solicitud
 
 ```bash
 openssl x509 -req -days 365 -in /etc/nginx/ssl/solicitud.csr -signkey /etc/nginx/ssl/clave_privada.key -out /etc/nginx/ssl/certificado.crt
 ```
 
+![alt text](./.images/capt6)
+
 ```bash
 server {
-  #Listen in the harbor 80, ipv4.
-  listen 80; 
+    # Escuchar en el puerto 80 para el subdominio
+    listen 80;
+    server_name millionx-academy.com nextcloud.millionx-academy.com webmin-dns.millionx-academy.com moodle.millionx-academy.com zabbix.millionx-academy.com grafana.millionx-academy.com;
+
+    # Redirigir tráfico HTTP a HTTPS
+    return 301 https://$host$request_uri;
 }
 
-server{
+server {
+    listen 443 ssl;
 
-  listen 442;
-  #Here you must enter the name of your domain.
-  server_name millionx-academy.com;
-  
-  ssl_certificate /etc/nginx/ssl/certificado.crt;
-  ssl_certificate_ley /etc/nginx/ssl/clave_privada.key
+    # Nombre del servidor o subdominio.
+    server_name millionx-academy.com;
 
-  access_log            /var/log/nginx/millionx-academy.com.access.log;
+    # Certificados SSL
+    ssl_certificate /etc/nginx/ssl/certificado.crt;
+    ssl_certificate_key /etc/nginx/ssl/clave_privada.key;
 
-  location / {
-      #The proxy settings.
-      proxy_pass http://192.168.20.12:700/;
-  }
+    # Configuración de acceso
+    access_log /var/log/nginx/millionx-academy.com.access.log;
+
+    location / {
+        # Configuración del proxy para redirigir a la IP interna.
+        proxy_pass http://192.168.20.5:80/;
+        
+        # Otras configuraciones del proxy (si es necesario).
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
 }
 ```
 
@@ -121,3 +143,5 @@ server{
 ```bash
 nginx -s reload
 ```
+
+![alt text](./.images/capt7)

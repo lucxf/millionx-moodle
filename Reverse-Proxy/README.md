@@ -75,7 +75,7 @@ chmod 700 /etc/nginx/ssl
 2. Crear clave privada del certificado
 
 ```bash
-openssl -algorithm RSA -out /etc/nginx/ssl/clave_privada.key
+openssl genpkey -algorithm RSA -out /etc/nginx/ssl/clave_privada.key
 ```
 
 3. Crear una solicitud para certificado ssl

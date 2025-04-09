@@ -140,15 +140,12 @@ iptables -A FORWARD -i $NicExt -o $vlan60 -p udp -d $router_LAN --dport $p_VPN_u
 iptables -A FORWARD -i $vlan60 -o $NicExt -p udp -s $router_LAN --sport $p_VPN_udp_traffic_LAN_router_LAN -j ACCEPT
 
 #======================= SSH =======================#
-
+# Permitimos SSH al router
 iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
 iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT
-
-iptables -A INPUT  -i $vlan20 -p tcp --sport $p_SSH -j ACCEPT
-iptables -A OUTPUT -o $vlan20 -p tcp --dport $p_SSH -j ACCEPT
-
-iptables -A INPUT  -i $vlan60 -p tcp --sport $p_SSH -j ACCEPT
-iptables -A OUTPUT -o $vlan60 -p tcp --dport $p_SSH -j ACCEPT
+# Permitir ssh hacie el router de la red LAN
+iptables -A OUTPUT -o $vlan60 -p tcp -d $router_LAN --dport $p_SSH -j ACCEPT
+iptables -A INPUT  -i $vlan60 -p tcp -s $router_LAN --sport $p_SSH -j ACCEPT
 
 #=============== TRAFICO LOOPBACK ===================#
 

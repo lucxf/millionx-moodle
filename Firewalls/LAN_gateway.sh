@@ -10,6 +10,7 @@ RedLAN="10.0.0.0/8"
 
 vpn_server="10.3.0.2"
 dns_server="192.168.20.5"
+router_NAT="192.168.60.1"
 
 p_SSH="22"
 p_http="80"
@@ -85,12 +86,9 @@ iptables -A FORWARD -i $vlan60 -o $vlan3  -p udp -d $vpn_server --dport $p_VPN_u
 iptables -A FORWARD -i $vlan3  -o $vlan60 -p udp -s $vpn_server --sport $p_VPN_udp_traffic -j ACCEPT
 
 #======================= SSH =======================#
-
-iptables -A INPUT  -i $vlan60 -p tcp --dport $p_SSH -j ACCEPT
-iptables -A OUTPUT -o $vlan60 -p tcp --sport $p_SSH -j ACCEPT
-
-iptables -A OUTPUT -o $vlan3 -p tcp --dport $p_SSH -j ACCEPT
-iptables -A INPUT  -i $vlan3 -p tcp --sport $p_SSH -j ACCEPT
+# Permitir ssh en desde router NAT
+iptables -A INPUT  -i $vlan60 -p tcp --dport $p_SSH -s $router_NAT -j ACCEPT
+iptables -A OUTPUT -o $vlan60 -p tcp --sport $p_SSH -d $router_NAT -j ACCEPT
 
 #=============== TRAFICO LOOPBACK ===================#
 

@@ -87,6 +87,14 @@ iptables -A INPUT  -i $vlan20 -p udp --sport $p_DNS -j ACCEPT
 iptables -A OUTPUT -o $vlan20 -p tcp --dport $p_DNS -j ACCEPT
 iptables -A INPUT  -i $vlan20 -p tcp --sport $p_DNS -j ACCEPT
 
+# Exterior --> Serivdor DNS
+# TCP
+iptables -A FORWARD -i $NicExt -o $vlan20 -p tcp -m multiport -d $dns_server --dports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $NicExt -p tcp -m multiport -s $dns_server --sports $p_DNS -j ACCEPT
+# UDP
+iptables -A FORWARD -i $NicExt -o $vlan20 -p udp -m multiport -d $dns_server --dports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $NicExt -p udp -m multiport -s $dns_server --sports $p_DNS -j ACCEPT
+
 # Vlan60 ---> Vlan20
 # TCP
 iptables -A FORWARD -i $vlan60 -o $vlan20 -p tcp -m multiport -d $dns_server --dports $p_DNS -j ACCEPT

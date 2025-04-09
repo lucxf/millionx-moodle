@@ -9,6 +9,7 @@ RedInterconexio="192.168.60.0/24"
 RedLAN="10.0.0.0/8"
 
 vpn_server="10.3.0.2"
+dns_server="192.168.20.5"
 
 p_SSH="22"
 p_http="80"
@@ -56,6 +57,14 @@ iptables -A INPUT  -i $vlan60 -p udp --sport $p_DNS -j ACCEPT
 # vlan3
 iptables -A FORWARD -i $vlan3  -o $vlan60 -p udp --dport $p_DNS -j ACCEPT
 iptables -A FORWARD -i $vlan60 -o $vlan3  -p udp --sport $p_DNS -j ACCEPT
+
+# vlan3 --> vlan60 (con destino dns server)
+# TCP
+iptables -A FORWARD -i $vlan3  -o $vlan60 -p tcp -m multiport -d $dns_server --dports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan60 -o $vlan3  -p tcp -m multiport -s $dns_server --sports $p_DNS -j ACCEPT
+# UDP
+iptables -A FORWARD -i $vlan3  -o $vlan60 -p udp -m multiport -d $dns_server --dports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan60 -o $vlan3  -p udp -m multiport -s $dns_server --sports $p_DNS -j ACCEPT
 
 #================ UPDATE/UPGRADE ====================#
 

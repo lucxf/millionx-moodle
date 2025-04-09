@@ -75,11 +75,11 @@ iptables -A FORWARD -s $RedAdministracio -p icmp --icmp-type echo-request -j ACC
 
 #======================= DNS =======================#
 
-# # ROUTER
+# ROUTER --> Exterior
 iptables -A OUTPUT -o $NicExt -p udp --dport $p_DNS -j ACCEPT
 iptables -A INPUT  -i $NicExt -p udp --sport $p_DNS -j ACCEPT
 
-# # VLAN40
+# VLAN40 --> Exterior
 iptables -A FORWARD -i $vlan40 -o $NicExt -p udp --dport $p_DNS -j ACCEPT
 iptables -A FORWARD -i $NicExt -o $vlan40 -p udp --sport $p_DNS -j ACCEPT
 

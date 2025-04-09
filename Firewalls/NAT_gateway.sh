@@ -67,27 +67,41 @@ done
 
 #======================= DNS =======================#
 # Router
-# Forwarding
+# 172.30.10.13:53/udp /tcp ---> 192.168.20.5:53 /udp /tcp (Servidor DNS LAN)
 iptables -t nat -i $NicExt -A PREROUTING -p udp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
 iptables -t nat -i $NicExt -A PREROUTING -p tcp --dport $p_DNS -j DNAT --to-destination $dns_server:$p_DNS
 
-# Permito la salida i entrada de tramas DNS
+# Router --> exterior
+# UDP
 iptables -A OUTPUT -o $NicExt -p udp --dport $p_DNS -j ACCEPT
 iptables -A INPUT  -i $NicExt -p udp --sport $p_DNS -j ACCEPT
+# TCP
+iptables -A OUTPUT -o $NicExt -p tcp --dport $p_DNS -j ACCEPT
+iptables -A INPUT  -i $NicExt -p tcp --sport $p_DNS -j ACCEPT
 
-# Vlan20
+# Router --> DMZ
+# UDP
+iptables -A OUTPUT -o $vlan20 -p udp --dport $p_DNS -j ACCEPT
+iptables -A INPUT  -i $vlan20 -p udp --sport $p_DNS -j ACCEPT
+# TCP
+iptables -A OUTPUT -o $vlan20 -p tcp --dport $p_DNS -j ACCEPT
+iptables -A INPUT  -i $vlan20 -p tcp --sport $p_DNS -j ACCEPT
 
-iptables -A FORWARD -i $vlan60 -o $NicExt -p tcp -m multiport --dports $p_DNS -j ACCEPT
-iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_DNS -j ACCEPT
-iptables -A FORWARD -i $vlan60 -o $NicExt -p udp -m multiport --dports $p_DNS -j ACCEPT
-iptables -A FORWARD -i $NicExt -o $vlan60 -p udp -m multiport --sports $p_DNS -j ACCEPT
+# Vlan60 ---> Vlan20
+# TCP
+iptables -A FORWARD -i $vlan60 -o $vlan20 -p tcp -m multiport -d $dns_server --dports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $vlan60 -p tcp -m multiport -s $dns_server --sports $p_DNS -j ACCEPT
+# UDP
+iptables -A FORWARD -i $vlan60 -o $vlan20 -p udp -m multiport -d $dns_server --dports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $vlan60 -p udp -m multiport -s $dns_server --sports $p_DNS -j ACCEPT
 
-# Vlan60
-
+# Vlan20 ---> NicExt
+# TCP
 iptables -A FORWARD -i $vlan20 -o $NicExt -p tcp -m multiport --dports $p_DNS -j ACCEPT
-iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan20 -p tcp -m multiport --sports $p_DNS -j ACCEPT
+# UDP
 iptables -A FORWARD -i $vlan20 -o $NicExt -p udp -m multiport --dports $p_DNS -j ACCEPT
-iptables -A FORWARD -i $NicExt -o $vlan60 -p udp -m multiport --sports $p_DNS -j ACCEPT
+iptables -A FORWARD -i $NicExt -o $vlan20 -p udp -m multiport --sports $p_DNS -j ACCEPT
 
 #================ UPDATE/UPGRADE ====================#
 

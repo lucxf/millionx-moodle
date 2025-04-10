@@ -25,6 +25,16 @@ p_VPN_udp_traffic_LAN_router_LAN="51820"
 vpn_server_DMZ="192.168.20.2"
 router_LAN="192.168.60.2"
 dns_server="192.168.20.5"
+# Servicios y puertos de acceso
+moodle_srv="192.168.20.10"
+monitoring_srv="192.168.20.11"
+nextcloud_srv="192.168.20.12"
+
+p_access_moodle="8080"
+p_access_zabbix="8080"
+p_access_nextcloud="700"
+p_access_grafana="3030"
+
 #=================== BORRADO DE REGLAS ====================#
 
 # Borramos reglas por defecto
@@ -125,6 +135,37 @@ iptables -A FORWARD -i $NicExt -o $vlan20 -p tcp -m multiport --sports $p_http,$
 iptables -A FORWARD -i $vlan60 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
 iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
 
+#======================= SERVICES WEB ACCESS =======================#
+
+# Exterior --> Router
+iptables -A INPUT  -i $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
+iptables -A OUTPUT -o $NicExt -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
+
+# Exterior --> DMZ
+# Nextcloud
+iptables -A INPUT  -i $vlan20 -p tcp --sport $p_access_nextcloud -j ACCEPT
+iptables -A OUTPUT -o $vlan20 -p tcp --dport $p_access_nextcloud -j ACCEPT
+
+iptables -A FORWARD -i $NicExt -o $vlan20 -d $nextcloud_srv -p tcp --dport $p_access_nextcloud -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $NicExt -s $nextcloud_srv -p tcp --sport $p_access_nextcloud -j ACCEPT
+# Zabbix
+iptables -A INPUT  -i $vlan20 -p tcp --sport $p_access_zabbix -j ACCEPT
+iptables -A OUTPUT -o $vlan20 -p tcp --dport $p_access_zabbix -j ACCEPT
+
+iptables -A FORWARD -i $NicExt -o $vlan20 -d $monitoring_srv -p tcp --dport $p_access_zabbix -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $NicExt -s $monitoring_srv -p tcp --sport $p_access_zabbix -j ACCEPT
+# Grafana
+iptables -A INPUT  -i $vlan20 -p tcp --sport $p_access_grafana -j ACCEPT
+iptables -A OUTPUT -o $vlan20 -p tcp --dport $p_access_grafana -j ACCEPT
+
+iptables -A FORWARD -i $NicExt -o $vlan20 -d $monitoring_srv -p tcp --dport $p_access_grafana -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $NicExt -s $monitoring_srv -p tcp --sport $p_access_grafana -j ACCEPT
+# Moodle
+iptables -A INPUT  -i $vlan20 -p tcp --sport $p_access_moodle -j ACCEPT
+iptables -A OUTPUT -o $vlan20 -p tcp --dport $p_access_moodle -j ACCEPT
+
+iptables -A FORWARD -i $NicExt -o $vlan20 -d $moodle_srv -p tcp --dport $p_access_moodle -j ACCEPT
+iptables -A FORWARD -i $vlan20 -o $NicExt -s $moodle_srv -p tcp --sport $p_access_moodle -j ACCEPT
 #======================= VPN =======================#
 
 # VPN traffic DMZ
@@ -140,15 +181,12 @@ iptables -A FORWARD -i $NicExt -o $vlan60 -p udp -d $router_LAN --dport $p_VPN_u
 iptables -A FORWARD -i $vlan60 -o $NicExt -p udp -s $router_LAN --sport $p_VPN_udp_traffic_LAN_router_LAN -j ACCEPT
 
 #======================= SSH =======================#
-
+# Permitimos SSH al router
 iptables -A INPUT  -i $NicExt -p tcp --dport $p_SSH -j ACCEPT
 iptables -A OUTPUT -o $NicExt -p tcp --sport $p_SSH -j ACCEPT
-
-iptables -A INPUT  -i $vlan20 -p tcp --sport $p_SSH -j ACCEPT
-iptables -A OUTPUT -o $vlan20 -p tcp --dport $p_SSH -j ACCEPT
-
-iptables -A INPUT  -i $vlan60 -p tcp --sport $p_SSH -j ACCEPT
-iptables -A OUTPUT -o $vlan60 -p tcp --dport $p_SSH -j ACCEPT
+# Permitir ssh hacie el router de la red LAN
+iptables -A OUTPUT -o $vlan60 -p tcp -d $router_LAN --dport $p_SSH -j ACCEPT
+iptables -A INPUT  -i $vlan60 -p tcp -s $router_LAN --sport $p_SSH -j ACCEPT
 
 #=============== TRAFICO LOOPBACK ===================#
 

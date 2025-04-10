@@ -25,6 +25,12 @@ p_VPN_udp_traffic_LAN_router_LAN="51820"
 vpn_server_DMZ="192.168.20.2"
 router_LAN="192.168.60.2"
 dns_server="192.168.20.5"
+
+moodle_srv="192.168.20.10"
+monitoring_srv="192.168.20.11"
+nextcloud_srv="192.168.20.12"
+
+servicios=($moodle_srv $monitoring_srv $nextcloud_srv)
 #=================== BORRADO DE REGLAS ====================#
 
 # Borramos reglas por defecto
@@ -124,6 +130,17 @@ iptables -A FORWARD -i $NicExt -o $vlan20 -p tcp -m multiport --sports $p_http,$
 # vlan60
 iptables -A FORWARD -i $vlan60 -o $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
 iptables -A FORWARD -i $NicExt -o $vlan60 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
+
+#======================= SERVICES WEB ACCESS =======================#
+
+iptables -A INPUT  -i $NicExt -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
+iptables -A OUTPUT -o $NicExt -p tcp -m multiport --iports $p_http,$p_https -j ACCEPT
+
+# Permitir el acceso de tramas https, http a serivcios de la DMZ
+for servicio in "${servicios[@]}"; do
+    iptables -A FORWARD -i $NicExt -o $vlan20 -p tcp -m multiport -d $servicio --dports $p_http,$p_https -j ACCEPT
+    iptables -A FORWARD -i $vlan20 -o $NicExt -p tcp -m multiport -s $servicio --sports $p_http,$p_https -j ACCEPT
+done
 
 #======================= VPN =======================#
 

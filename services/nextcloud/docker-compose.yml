@@ -1,0 +1,36 @@
+version: '2.2'
+services:
+
+   nextcloud_db: # default port 3306 for Nextcloud
+      container_name: nextcloud_db
+      image: mariadb
+      restart: always
+      volumes:
+         - /volums/millionx-moodle/nextcloud_db:/var/lib/mysql
+      env_file:
+         - nextcloud.env
+      networks:
+         - internal
+
+   nextcloud: # default port 80 (changed to 700)
+      image: nextcloud
+      container_name: nextcloud
+      restart: always
+      volumes:
+         - /volums/millionx-moodle/NextCloud:/var/www/html
+      depends_on:
+         - nextcloud_db
+      env_file:
+         - nextcloud.env
+      networks:
+         - xarxa_bridge
+         - internal
+      ports:
+        - "700:80"
+
+networks:
+   xarxa_bridge:
+      name: xarxa_bridge
+      driver: bridge
+   internal:
+      name: internal

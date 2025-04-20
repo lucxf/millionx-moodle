@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#     _______       __   __________  ____  _   ___________    __ 
+#    / ____/ |     / /  / ____/ __ \/ __ \/ | / /_  __/   |  / / 
+#   / /_   | | /| / /  / /_  / /_/ / / / /  |/ / / / / /| | / /  
+#  / __/   | |/ |/ /  / __/ / _, _/ /_/ / /|  / / / / ___ |/ /___
+# /_/      |__/|__/  /_/   /_/ |_|\____/_/ |_/ /_/ /_/  |_/_____/
+                                                               
 # Targetas
 NicExt="ens33"
 vlan20="ens38"
@@ -42,7 +48,7 @@ iptables -F
 iptables -t nat -F
 iptables -X
 iptables -Z
-# Por defecto todo ACCEPT de momento
+
 iptables -P INPUT   DROP
 iptables -P OUTPUT  DROP
 iptables -P FORWARD DROP
@@ -169,14 +175,17 @@ iptables -A FORWARD -i $vlan20 -o $NicExt -s $moodle_srv -p tcp --sport $p_acces
 #======================= VPN =======================#
 
 # VPN traffic DMZ
+# 172.30.10.13:51820/udp == 192.168.20.2:51820/udp
 iptables -t nat -A PREROUTING  -i $NicExt -p udp --dport $p_VPN_udp_traffic_DMZ -j DNAT --to-destination $vpn_server_DMZ:$p_VPN_udp_traffic_DMZ
-
+# Permito el forwarding de tramas por el puerto hacia el serivdor VPN
 iptables -A FORWARD -i $NicExt -o $vlan20 -d $vpn_server_DMZ -p udp --dport $p_VPN_udp_traffic_DMZ -j ACCEPT
 iptables -A FORWARD -i $vlan20 -o $NicExt -s $vpn_server_DMZ -p udp --sport $p_VPN_udp_traffic_DMZ -j ACCEPT
 
 # VPN traffic LAN
+# Como el 51821/udp está ocupado uso el 51821/udp (se ha de cambiar en el archivo peer)
+# 172.30.10.13:51821/udp == 192.168.20.2:51820/udp
 iptables -t nat -A PREROUTING -p udp --dport $p_VPN_udp_traffic_LAN -j DNAT --to-destination $router_LAN:$p_VPN_udp_traffic_LAN_router_LAN
-
+# Permito el forwarding de tramas por el puerto hacia el serivdor VPN
 iptables -A FORWARD -i $NicExt -o $vlan60 -p udp -d $router_LAN --dport $p_VPN_udp_traffic_LAN_router_LAN -j ACCEPT
 iptables -A FORWARD -i $vlan60 -o $NicExt -p udp -s $router_LAN --sport $p_VPN_udp_traffic_LAN_router_LAN -j ACCEPT
 

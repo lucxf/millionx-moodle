@@ -1,5 +1,11 @@
 #/bin/bash
 
+#     _______       __   __    ___    _   __
+#    / ____/ |     / /  / /   /   |  / | / /
+#   / /_   | | /| / /  / /   / /| | /  |/ / 
+#  / __/   | |/ |/ /  / /___/ ___ |/ /|  /  
+# /_/      |__/|__/  /_____/_/  |_/_/ |_/                                 
+
 vlan3="ens37"
 vlan60="ens33"
 
@@ -25,7 +31,7 @@ iptables -F
 iptables -t nat -F
 iptables -X
 iptables -Z
-# Por defecto todo ACCEPT de momento
+
 iptables -P INPUT   DROP
 iptables -P OUTPUT  DROP
 iptables -P FORWARD DROP
@@ -80,8 +86,9 @@ iptables -A FORWARD -i $vlan60 -o $vlan3 -p tcp -m multiport --sports $p_http,$p
 #======================= VPN =======================#
 
 # VPN traffic LAN
+# 172.30.10.13:51820/udp == 192.168.20.2:51820/udp
 iptables -t nat -A PREROUTING -p udp --dport $p_VPN_udp_traffic -j DNAT --to-destination $vpn_server:$p_VPN_udp_traffic
-
+# Permito el forwarding de tramas por el puerto hacia el serivdor VPN
 iptables -A FORWARD -i $vlan60 -o $vlan3  -p udp -d $vpn_server --dport $p_VPN_udp_traffic -j ACCEPT
 iptables -A FORWARD -i $vlan3  -o $vlan60 -p udp -s $vpn_server --sport $p_VPN_udp_traffic -j ACCEPT
 

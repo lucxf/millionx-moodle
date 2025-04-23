@@ -60,6 +60,7 @@ iptables -t nat -A POSTROUTING -s $RedDMZ          -o $NicExt -j MASQUERADE
 iptables -t nat -A POSTROUTING -s $RedInterconexio -o $NicExt -j MASQUERADE
 iptables -t nat -A POSTROUTING -d $RedLAN          -o $vlan60 -j MASQUERADE
 iptables -t nat -A POSTROUTING -d $RedInterconexio -o $vlan60 -j MASQUERADE
+iptables -t nat -A POSTROUTING -d $RedDMZ          -o $vlan20 -j MASQUERADE
 
 #======================= ICMP =======================#
 

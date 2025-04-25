@@ -77,11 +77,11 @@ iptables -A FORWARD -i $vlan60 -o $vlan3  -p udp -m multiport -s $dns_server --s
 #================ UPDATE/UPGRADE ====================#
 
 # ROUTER (mirar como hacer que solo se a los repos, no a otro lado)
-iptables -A OUTPUT -o $vlan60 -j ACCEPT
+iptables -A OUTPUT -o $vlan60 -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
 iptables -A INPUT  -i $vlan60 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
 
 # vlan3 (Permito el forwarding de tramas desde la vlan3)
-iptables -A FORWARD -i $vlan3 -o $vlan60 -j ACCEPT
+iptables -A FORWARD -i $vlan3 -o $vlan60 -p tcp -m multiport --dports $p_http,$p_https-j ACCEPT
 iptables -A FORWARD -i $vlan60 -o $vlan3 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
 
 #======================= VPN =======================#

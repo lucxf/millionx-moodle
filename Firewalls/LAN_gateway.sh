@@ -39,7 +39,7 @@ iptables -P FORWARD DROP
 #=================== NAT ====================#
 
 iptables -t nat -A POSTROUTING -s $RedLAN -o $vlan60 -j MASQUERADE
-iptables -t nat -A POSTROUTING -d $RedLAN -o $vlan3 -j MASQUERADE
+iptables -t nat -A POSTROUTING -d $RedLAN -o $vlan3  -j MASQUERADE
 #======================= ICMP =======================#
 
 # ROUTER
@@ -81,7 +81,7 @@ iptables -A OUTPUT -o $vlan60 -p tcp -m multiport --dports $p_http,$p_https -j A
 iptables -A INPUT  -i $vlan60 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
 
 # vlan3 (Permito el forwarding de tramas desde la vlan3)
-iptables -A FORWARD -i $vlan3 -o $vlan60 -p tcp -m multiport --dports $p_http,$p_https-j ACCEPT
+iptables -A FORWARD -i $vlan3 -o $vlan60 -p tcp -m multiport --dports $p_http,$p_https -j ACCEPT
 iptables -A FORWARD -i $vlan60 -o $vlan3 -p tcp -m multiport --sports $p_http,$p_https -j ACCEPT
 
 #======================= VPN =======================#
